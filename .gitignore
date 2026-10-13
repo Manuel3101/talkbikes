@@ -1,0 +1,14 @@
+# Node
+*node_modules*
+*dist*
+
+# IDEs
+.vscode
+.zed
+
+# env
+.env
+
+# Miscellaneous
+.husky
+.nx/cache

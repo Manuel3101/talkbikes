@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "sortTailwindcss": {},
+  "semi": true,
+  "trailingComma": "all",
+  "singleQuote": true,
+  "printWidth": 120,
+  "tabWidth": 2,
+  "arrowParens": "avoid",
+  "vueIndentScriptAndStyle": false,
+  "sortPackageJson": false,
+  "ignorePatterns": ["node_modules", "dist", "coverage", "generated", "libs/ui"]
+}

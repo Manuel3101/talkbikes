@@ -1,0 +1,94 @@
+name: ci
+
+on:
+    push:
+        branches:
+            - dev
+            - main
+
+    pull_request:
+        branches:
+            - dev
+            - main
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    setup:
+        name: Setup & Cache
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v7.0.1
+
+            # Installs runtime by reading .nvmrc
+            - name: Install pnpm and Node.js
+              uses: pnpm/setup@v3
+              with:
+                  cache: true
+
+    lint:
+        name: Linting
+        needs:
+            - setup
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7.0.1
+
+            # Installs runtime by reading .nvmrc
+            - name: Install pnpm and Node.js
+              uses: pnpm/setup@v3
+              with:
+                  cache: true
+
+            - run: node --run lint
+
+    format:
+        name: Formatting
+        needs:
+            - setup
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7.0.1
+
+            # Installs runtime by reading .nvmrc
+            - name: Install pnpm and Node.js
+              uses: pnpm/setup@v3
+              with:
+                  cache: true
+
+            - run: node --run format
+
+    typecheck:
+        name: Type Check
+        needs: setup
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7.0.1
+
+            # Installs runtime by reading .nvmrc
+            - name: Install pnpm and Node.js
+              uses: pnpm/setup@v3
+              with:
+                  cache: true
+
+            - name: Run typecheck
+              run: node --run type-check
+
+    test:
+        name: Test
+        needs: setup
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7.0.1
+
+            # Installs runtime by reading .nvmrc
+            - name: Install pnpm and Node.js
+              uses: pnpm/setup@v3
+              with:
+                  cache: true
+
+            - name: Run tests
+              run: node --run test:unit
