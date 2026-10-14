@@ -9,10 +9,11 @@
     "isolatedModules": true,
     "experimentalDecorators": true,
     "importHelpers": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@chatwithgbfs/shared": ["../packages/shared/src/index.ts"],
       "@spartan-ng/helm/message-scroller": ["./libs/ui/message-scroller/src/index.ts"],
       "@spartan-ng/helm/utils": ["./libs/ui/utils/src/index.ts"],
       "@spartan-ng/helm/button": ["./libs/ui/button/src/index.ts"]

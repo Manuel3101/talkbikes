@@ -1,7 +1,7 @@
 packages:
   - frontend
   - backend
-  - packages/**/*
+  - packages/*
 
 minimumReleaseAge: 4320
 minimumReleaseAgeExclude:

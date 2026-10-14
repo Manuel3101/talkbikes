@@ -22,9 +22,6 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "types": ["vitest/globals", "node"],
-    "paths": {
-      "@chatwithgbfs/shared": ["../packages/shared/src/index.ts"]
-    }
+    "types": ["vitest/globals", "node"]
   }
 }
