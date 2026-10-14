@@ -1,0 +1,25 @@
+<form
+  class="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-xl border border-white/10 bg-[#17171b] p-2 shadow-inner shadow-black/20"
+  [attr.aria-busy]="isSubmitting()"
+  (submit)="submit($event, questionInput)"
+>
+  <label class="sr-only" for="chat-message">Stelle eine Frage an den GBFS Assistenten</label>
+  <textarea
+    #questionInput
+    id="chat-message"
+    rows="1"
+    placeholder="Stelle eine Frage an den GBFS Assistenten"
+    class="max-h-32 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+  ></textarea>
+  <button
+    type="submit"
+    aria-label="Nachricht senden"
+    [disabled]="isSubmitting()"
+    class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-indigo-500 text-white transition-colors hover:bg-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 disabled:cursor-not-allowed disabled:opacity-40"
+  >
+    <svg aria-hidden="true" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 14-7-7 14-2-6-5-1Zm7 0h7" />
+    </svg>
+  </button>
+</form>
+<p class="mt-2 text-center text-[11px] text-zinc-600">KI generierte Nachrichten können fehlerhaft sein.</p>

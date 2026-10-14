@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { ChatMessage } from '@chatwithgbfs/shared';
 
 @Component({
   imports: [],
@@ -6,5 +7,5 @@ import { Component, input } from '@angular/core';
   templateUrl: './system-message.html',
 })
 export class SystemMessage {
-  public message = input.required<{ id: string; role: 'user' | 'system'; content: string }>();
+  public message = input.required<ChatMessage>();
 }

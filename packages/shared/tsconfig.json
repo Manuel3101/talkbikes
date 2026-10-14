@@ -1,0 +1,29 @@
+{
+  "exclude": ["generated/**", "dist/**"],
+  "compilerOptions": {
+    /* Base Options: */
+    "types": ["node"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2024",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+
+    /* Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
+
+    /* If transpiling with TypeScript: */
+    "module": "NodeNext",
+    "outDir": "dist",
+
+    /* If your code doesn't run in the DOM: */
+    "lib": ["es2024"]
+  }
+}

@@ -1,36 +1,66 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ChatMessage } from '@chatwithgbfs/shared';
 import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
-import { SystemMessage } from './system-message/system-message';
+import { ChatService } from './chat.service';
+import { SystemMessage as AssistantMessage } from './system-message/system-message';
 import { UserMessage } from './user-message/user-message';
+import { UserQuestion } from './user-question/user-question';
 
 @Component({
-  imports: [RouterOutlet, HlmMessageScrollerImports, SystemMessage, UserMessage],
+  imports: [RouterOutlet, HlmMessageScrollerImports, AssistantMessage, UserMessage, UserQuestion],
   selector: 'app-root',
   templateUrl: './app.html',
 })
 export class App {
+  private readonly chatService = inject(ChatService);
   protected readonly title = signal('frontend');
-  // TODO: stream into messages from a service
-  protected messages = signal<{ id: string; role: 'user' | 'system'; content: string }[]>([
+  protected readonly isStreaming = signal(false);
+  protected messages = signal<ChatMessage[]>([
     {
       id: '1',
       role: 'system',
       content:
-        'Good morning! I can help you explore transit feeds, station availability, and service status. What would you like to know?',
-    },
-    { id: '2', role: 'user', content: 'Which stations have the most available bikes right now?' },
-    {
-      id: '3',
-      role: 'system',
-      content:
-        'I’ll check the latest feed data and compare availability across stations. One moment while I look through the network.',
-    },
-    {
-      id: '4',
-      role: 'system',
-      content: `The busiest stations with available bikes are: Central Station — 18 bikes, Riverside Park — 14 bikes and Market Square — 11 bikes
-    `,
+        'Guten Tag, ich bin ein KI-gestützter Chatbot, der Ihnen bei Ihren Fragen rund um sharing Angebote helfen kann. Stelle mir einfach eine Frage wie: "Wo finde ich ein ebike nahe Köln Hauptbahnhof?" oder "Wo ist die nächste Bikesharing Station von Köln Haupfbahnhof?"',
     },
   ]);
+
+  protected async submitQuestion(question: string): Promise<void> {
+    if (this.isStreaming()) {
+      return;
+    }
+
+    this.messages.update(messages => [...messages, { id: crypto.randomUUID(), role: 'user', content: question }]);
+    this.isStreaming.set(true);
+
+    try {
+      for await (const message of this.chatService.send(question)) {
+        this.messages.update(messages => {
+          const existingMessage = messages.some(currentMessage => currentMessage.id === message.id);
+
+          if (!existingMessage) {
+            return [...messages, message];
+          }
+
+          return messages.map(currentMessage =>
+            currentMessage.id === message.id
+              ? { ...currentMessage, content: currentMessage.content + message.content }
+              : currentMessage,
+          );
+        });
+      }
+    } catch (error: unknown) {
+      console.error(error);
+      this.messages.update(messages => [
+        ...messages,
+        {
+          id: crypto.randomUUID(),
+          role: 'system',
+          content: 'I could not send that question. Please try again.',
+        },
+      ]);
+    } finally {
+      this.isStreaming.set(false);
+    }
+  }
 }
