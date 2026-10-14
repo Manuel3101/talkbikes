@@ -12,15 +12,10 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@spartan-ng/helm/message-scroller": [
-        "./libs/ui/message-scroller/src/index.ts"
-      ],
-      "@spartan-ng/helm/utils": [
-        "./libs/ui/utils/src/index.ts"
-      ],
-      "@spartan-ng/helm/button": [
-        "./libs/ui/button/src/index.ts"
-      ]
+      "@chatwithgbfs/shared": ["../packages/shared/src/index.ts"],
+      "@spartan-ng/helm/message-scroller": ["./libs/ui/message-scroller/src/index.ts"],
+      "@spartan-ng/helm/utils": ["./libs/ui/utils/src/index.ts"],
+      "@spartan-ng/helm/button": ["./libs/ui/button/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

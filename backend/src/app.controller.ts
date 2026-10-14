@@ -1,7 +1,7 @@
 import { userQuestionSchema, validateInput } from '@chatwithgbfs/shared';
 import { BadRequestException, Body, Controller, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
-import { AppService } from './app.service.js';
+import { AppService } from './app.service.ts';
 
 @Controller()
 export class AppController {
