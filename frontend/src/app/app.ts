@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ChatMessage } from '@chatwithgbfs/shared';
 import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
+import type { ChatMessage } from '@talkbikes/shared';
 import { ChatService } from './chat.service';
 import { SystemMessage as AssistantMessage } from './system-message/system-message';
 import { UserMessage } from './user-message/user-message';

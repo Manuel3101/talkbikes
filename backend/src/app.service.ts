@@ -1,5 +1,6 @@
 import { ChatMessage } from '@chatwithgbfs/shared';
 import { Injectable } from '@nestjs/common';
+import type { ChatMessage, ModelToolCall } from '@talkbikes/shared';
 import ollama from 'ollama';
 
 @Injectable()

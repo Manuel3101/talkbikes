@@ -1,5 +1,5 @@
 {
-  "name": "@chatwithgbfs/frontend",
+  "name": "@talkbikes/frontend",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -25,7 +25,7 @@
     "@ng-icons/core": ">=32.0.0 <34.0.0",
     "@ng-icons/lucide": ">=32.0.0 <34.0.0",
     "@spartan-ng/brain": "1.6.3",
-    "@chatwithgbfs/shared": "workspace:",
+    "@talkbikes/shared": "workspace:",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "rxjs": "~7.8.0",

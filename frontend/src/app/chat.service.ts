@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ChatMessage, chatMessageSchema, validateInput } from '@chatwithgbfs/shared';
+import { ChatMessage, chatMessageSchema, validateInput } from '@talkbikes/shared';
 
 // TODO: replace with .env variable
 const CHAT_ENDPOINT = 'http://localhost:3000/chat';

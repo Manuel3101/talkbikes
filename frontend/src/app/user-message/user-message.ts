@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { ChatMessage } from '@chatwithgbfs/shared';
+import { ChatMessage } from '@talkbikes/shared';
 
 @Component({
   imports: [],

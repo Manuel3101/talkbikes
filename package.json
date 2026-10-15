@@ -1,10 +1,10 @@
 {
-  "name": "chatwithgbfs",
+  "name": "talkbikes",
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"pnpm --filter @chatwithgbfs/backend start:dev\" \"pnpm --filter @chatwithgbfs/frontend start\"",
+    "dev": "concurrently \"pnpm --filter @talkbikes/backend start:dev\" \"pnpm --filter @talkbikes/frontend start\"",
     "lint:check": "pnpm run -r lint:check",
     "lint": "pnpm run -r lint",
     "format": "pnpm run -r format",
