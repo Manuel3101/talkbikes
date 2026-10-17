@@ -7,9 +7,8 @@ describe('SystemMessage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SystemMessage]
-    })
-      .compileComponents();
+      imports: [SystemMessage],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SystemMessage);
     component = fixture.componentInstance;

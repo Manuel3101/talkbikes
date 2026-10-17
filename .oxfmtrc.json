@@ -7,7 +7,6 @@
   "printWidth": 120,
   "tabWidth": 2,
   "arrowParens": "avoid",
-  "vueIndentScriptAndStyle": false,
-  "sortPackageJson": false,
-  "ignorePatterns": ["node_modules", "dist", "coverage", "generated", "libs/ui"]
+  "sortPackageJson": true,
+  "ignorePatterns": ["node_modules", "dist", "coverage", "generated", "**/libs/ui/**"]
 }

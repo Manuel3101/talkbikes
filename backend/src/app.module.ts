@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller.ts';
-import { LlmModule } from './llm/llm.module.js';
-import { ToolsModule } from './tools/tools.module.js';
-import { GbfsModule } from './gbfs/gbfs.module.js';
+import { LlmModule } from './llm/llm.module.ts';
+import { ToolsModule } from './tools/tools.module.ts';
 
 @Module({
-  imports: [LlmModule, ToolsModule, GbfsModule],
+  imports: [LlmModule, ToolsModule],
   controllers: [AppController],
 })
 export class AppModule {}

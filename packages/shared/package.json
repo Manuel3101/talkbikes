@@ -1,16 +1,23 @@
 {
   "name": "@talkbikes/shared",
-  "private": true,
   "version": "0.0.0",
-  "license": "ISC",
+  "private": true,
   "description": "A library of shared utilities and types.",
   "keywords": [
     "nodejs",
     "typescript",
     "utility"
   ],
+  "license": "ISC",
   "author": "Manuel Claßen",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
   "scripts": {
     "build": "tsdown",
     "lint:check": "oxlint",
@@ -20,19 +27,12 @@
     "type-check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.mjs"
-    }
+  "dependencies": {
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "tsdown": "^0.23.0",
     "typescript": "catalog:"
-  },
-  "dependencies": {
-    "valibot": "^1.5.0"
   }
 }
