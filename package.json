@@ -2,6 +2,10 @@
   "name": "talkbikes",
   "version": "0.0.0",
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"pnpm --filter @talkbikes/backend start:dev\" \"pnpm --filter @talkbikes/frontend start\"",
@@ -9,11 +13,14 @@
     "lint": "pnpm run -r lint",
     "format": "pnpm run -r format",
     "format:check": "pnpm run -r format:check",
-    "type-check": "pnpm run -r type-check"
+    "type-check": "pnpm run -r type-check",
+    "test": "pnpm run -r test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -21,11 +28,5 @@
       "onFail": "download"
     }
   },
-  "packageManager": "pnpm@12.11.2",
-  "type": "module",
-  "devDependencies": {
-    "concurrently": "^10.0.6",
-    "oxfmt": "^0.72.0",
-    "oxlint": "^1.87.0"
-  }
+  "packageManager": "pnpm@12.11.2"
 }

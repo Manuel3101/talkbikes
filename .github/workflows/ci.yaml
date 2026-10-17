@@ -91,4 +91,4 @@ jobs:
                   cache: true
 
             - name: Run tests
-              run: node --run test:unit
+              run: node --run test
