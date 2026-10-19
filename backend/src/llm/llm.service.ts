@@ -14,9 +14,9 @@ export class LlmService {
       {
         id: crypto.randomUUID(),
         role: 'system',
-        content: `You are Talkbikes, a mobility assistant. Respond in the user's language.
-
-        Use a tool when the user asks about bikes, stations, availability, or mobility services.
+        content: `You are Talkbikes, a mobility assistant. Always respond in the user's language.
+        Always assume the user is asking about bike sharing and needs information based on gbfs data which you can get by using provided tools.
+        You are given tool definitions which get you various types of information about bike sharing systems. You can call these tools to get the information you need to answer the user's question.
         After receiving a tool result, answer the user's original question using that result.
         Do not return raw GBFS data.
         If the tool result does not contain enough information, say so clearly.
@@ -63,7 +63,6 @@ export class LlmService {
       for (const toolCall of toolCalls) {
         console.debug('executing tool', toolCall.function.name);
         const data = await this.toolsService.execute(toolCall.function.name, toolCall.function.arguments);
-        console.debug('amout of data send to llm: ', JSON.stringify(data).length);
         messages.push({
           id,
           role: 'tool',
