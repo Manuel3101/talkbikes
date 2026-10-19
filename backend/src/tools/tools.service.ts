@@ -1,5 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { toolArgumentsSchema, validateInput, type ToolArguments, type ToolDefinition } from '@talkbikes/shared';
+import {
+  toolArgumentsSchema,
+  validateInput,
+  type BikeAvailabilityTool,
+  type StationInformationTool,
+  type StationStatusTool,
+  type ToolArguments,
+  type ToolDefinition,
+} from '@talkbikes/shared';
+import { GbfsService } from '../gbfs/gbfs.service.ts';
 
 export type AppTool = {
   definition: ToolDefinition;
@@ -8,71 +17,76 @@ export type AppTool = {
 
 @Injectable()
 export class ToolsService {
-  readonly tools: AppTool[] = [
-    {
-      definition: {
-        type: 'function',
-        function: {
-          name: 'get_bike_availability',
-          description: 'Find available bikes for a location.',
-          parameters: {
-            type: 'object',
-            properties: {
-              location: {
-                type: 'string',
-                description: 'The station, address, or place to check.',
-              },
-            },
-            required: ['location'],
-          },
-        },
-      },
-      handler: this.getBikeAvailability.bind(this),
-    },
-    {
-      definition: {
-        type: 'function',
-        function: {
-          name: 'get_station_information',
-          description: 'Find information about a specific station.',
-          parameters: {
-            type: 'object',
-            properties: {
-              location: {
-                type: 'string',
-                description: 'The station id, name or shortname.',
-              },
-            },
-            required: ['location'],
-          },
-        },
-      },
-      handler: this.getStationInformation.bind(this),
-    },
-    {
-      definition: {
-        type: 'function',
-        function: {
-          name: 'get_station_status',
-          description: 'Get current status about a specific station.',
-          parameters: {
-            type: 'object',
-            properties: {
-              location: {
-                type: 'string',
-                description: 'The station id',
-              },
-            },
-            required: ['location'],
-          },
-        },
-      },
-      handler: this.getStationStatus.bind(this),
-    },
-  ];
+  readonly tools: AppTool[] = [];
+  readonly definitions: ToolDefinition[] = [];
 
-  readonly definitions: ToolDefinition[] = this.tools.map(tool => tool.definition);
+  constructor(private readonly gbfsService: GbfsService) {
+    this.tools = [
+      {
+        definition: {
+          type: 'function',
+          function: {
+            name: 'get_bike_availability',
+            description: 'Find available bikes for a location.',
+            parameters: {
+              type: 'object',
+              properties: {
+                location: {
+                  type: 'string',
+                  description: 'The station, address, or place to check.',
+                },
+              },
+              required: ['location'],
+            },
+          },
+        },
+        handler: args => this.getBikeAvailability(args),
+      },
+      {
+        definition: {
+          type: 'function',
+          function: {
+            name: 'get_station_information',
+            description: 'Find information about a specific station.',
+            parameters: {
+              type: 'object',
+              properties: {
+                location: {
+                  type: 'string',
+                  description: 'The station id, name or shortname.',
+                },
+              },
+              required: ['location'],
+            },
+          },
+        },
+        handler: args => this.getStationInformation(args),
+      },
+      {
+        definition: {
+          type: 'function',
+          function: {
+            name: 'get_station_status',
+            description: 'Get current status about a specific station.',
+            parameters: {
+              type: 'object',
+              properties: {
+                location: {
+                  type: 'string',
+                  description: 'The station id',
+                },
+              },
+              required: ['location'],
+            },
+          },
+        },
+        handler: args => this.getStationStatus(args),
+      },
+    ];
+    this.definitions = this.tools.map(tool => tool.definition);
+  }
 
+  // TODO: should be properly typed
   async execute(name: string, args: unknown): Promise<unknown> {
     const tool = this.tools.find(currentTool => currentTool.definition.function.name === name);
     if (!tool) {
@@ -95,48 +109,93 @@ export class ToolsService {
     return output;
   }
 
-  private async getBikeAvailability(args: ToolArguments): Promise<unknown> {
+  private async getBikeAvailability(args: ToolArguments): Promise<BikeAvailabilityTool> {
     const location = args.location;
     if (typeof location !== 'string' || location.trim() === '') {
       throw new Error('The location argument must be a non-empty string.');
     }
 
-    const response = await fetch('https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_kg/de/free_bike_status.json');
-    const data = await response.json();
+    const result = await this.gbfsService.getBikeAvailability();
+    if (!result) {
+      return {
+        success: false,
+        error: 'Failed to retrieve bike availability data.',
+      };
+    }
 
-    return {
-      location: location.trim(),
-      message: data,
-    };
+    const { data } = result;
+    const response: BikeAvailabilityTool = { success: true, availableBikes: [] };
+
+    for (const bike of data.bikes) {
+      response.availableBikes.push({
+        stationId: bike.station_id,
+        type: bike.vehicle_type_id ?? 'unknown',
+        latitude: bike.lat,
+        longitude: bike.lon,
+      });
+    }
+
+    return response;
   }
 
-  private async getStationInformation(args: ToolArguments): Promise<unknown> {
+  private async getStationInformation(args: ToolArguments): Promise<StationInformationTool> {
     const location = args.location;
     if (typeof location !== 'string' || location.trim() === '') {
       throw new Error('The location argument must be a non-empty string.');
     }
 
-    const response = await fetch('https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_kg/de/station_information.json');
-    const data = await response.json();
+    const result = await this.gbfsService.getStationInformation();
+    if (!result) {
+      return {
+        success: false,
+        error: 'Failed to retrieve station information data.',
+      };
+    }
 
-    return {
-      location: location.trim(),
-      message: data,
-    };
+    const { data } = result;
+    const response: StationInformationTool = { success: true, stations: [] };
+
+    for (const station of data.stations) {
+      response.stations.push({
+        id: station.station_id,
+        latitude: station.lat,
+        longitude: station.lon,
+        name: station.name,
+        address: station.address,
+      });
+    }
+
+    return response;
   }
 
-  private async getStationStatus(args: ToolArguments): Promise<unknown> {
+  private async getStationStatus(args: ToolArguments): Promise<StationStatusTool> {
     const location = args.location;
     if (typeof location !== 'string' || location.trim() === '') {
       throw new Error('The location argument must be a non-empty string.');
     }
 
-    const response = await fetch('https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_kg/de/station_status.json');
-    const data = await response.json();
+    const result = await this.gbfsService.getStationStatus();
+    if (!result) {
+      return {
+        success: false,
+        error: 'Failed to retrieve station status data.',
+      };
+    }
 
-    return {
-      location: location.trim(),
-      message: data,
-    };
+    const { data } = result;
+    const response: StationStatusTool = { success: true, stations: [] };
+
+    for (const station of data.stations) {
+      response.stations.push({
+        id: station.station_id,
+        isInstalled: station.is_installed,
+        isRenting: station.is_renting,
+        isReturning: station.is_returning,
+        numBikesAvailable: station.num_bikes_available,
+        numDocksAvailable: station.num_docks_available,
+      });
+    }
+
+    return response;
   }
 }

@@ -236,6 +236,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.2
         version: 4.1.11(vitest@4.1.11)
+      gbfs-typescript-types:
+        specifier: ^1.0.15
+        version: 1.0.15
       oxlint-tsgolint:
         specifier: ^7.0.2001
         version: 7.0.2003
@@ -4128,6 +4131,9 @@ packages:
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
+  gbfs-typescript-types@1.0.15:
+    resolution: {integrity: sha512-aGMAlo8rX0eqP7JJGO7qrIM5vvbAcZtXg9Ef2zq7HQqNfkm08nmITnXL7UYfEMqUHouAt9sBO9rpJ0HVP5O2NA==}
+
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
@@ -5581,6 +5587,9 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  ts-interface-checker@1.0.2:
+    resolution: {integrity: sha512-4IKKvhZRXhvtYF/mtu+OCfBqJKV6LczUq4kQYcpT+iSB7++R9+giWnp2ecwWMIcnG16btVOkXFnoxLSYMN1Q1g==}
 
   ts-morph@25.0.1:
     resolution: {integrity: sha512-QJEiTdnz1YjrB3JFhd626gX4rKHDLSjSVMvGGG4v7ONc3RBwa0Eei98G9AT9uNFDMtV54JyuXsFeC+OH0n6bXQ==}
@@ -9646,6 +9655,10 @@ snapshots:
 
   function-bind@1.1.2: {}
 
+  gbfs-typescript-types@1.0.15:
+    dependencies:
+      ts-interface-checker: 1.0.2
+
   gensync@1.0.0-beta.2: {}
 
   get-caller-file@2.0.5: {}
@@ -11189,6 +11202,8 @@ snapshots:
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:
       typescript: 6.0.3
+
+  ts-interface-checker@1.0.2: {}
 
   ts-morph@25.0.1:
     dependencies:
