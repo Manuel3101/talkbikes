@@ -38,14 +38,16 @@ export class App {
         this.messages.update(messages => {
           const existingMessage = messages.some(currentMessage => currentMessage.id === message.id);
 
-          if (!existingMessage) {
+        this.messages.update(messages => {
+          const index = messages.findIndex(currentMessage => currentMessage.id === message.id);
+
+          if (index === -1) {
             return [...messages, message];
           }
 
-          return messages.map(currentMessage =>
-            currentMessage.id === message.id
-              ? { ...currentMessage, content: currentMessage.content + message.content }
-              : currentMessage,
+          const existingMessage = messages[index];
+          return messages.map((currentMessage, i) =>
+            i === index ? { ...existingMessage, content: existingMessage.content + message.content } : currentMessage,
           );
         });
       }
