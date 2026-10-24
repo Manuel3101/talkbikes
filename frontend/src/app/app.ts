@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
-import type { ChatMessage } from '@talkbikes/shared';
-import { ChatService } from './chat.service';
+import type { ChatMessage, ProcessedToolData } from '@talkbikes/shared';
+import { ChatService } from './services/chat.service';
 import { SystemMessage as AssistantMessage } from './system-message/system-message';
 import { UserMessage } from './user-message/user-message';
 import { UserQuestion } from './user-question/user-question';
@@ -14,7 +14,7 @@ import { UserQuestion } from './user-question/user-question';
 })
 export class App {
   private readonly chatService = inject(ChatService);
-  protected readonly title = signal('frontend');
+  protected readonly title = signal('Talkbikes');
   protected readonly isStreaming = signal(false);
   protected messages = signal<ChatMessage[]>([
     {
