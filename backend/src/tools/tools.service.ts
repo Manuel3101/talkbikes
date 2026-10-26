@@ -97,12 +97,8 @@ export class ToolsService {
   }
 
   private parseArguments(args: unknown): ToolArguments {
-    if (typeof args === 'string') {
-      const parsed: unknown = JSON.parse(args);
-      return this.parseArguments(parsed);
-    }
-
-    const { success, output } = validateInput(toolArgumentsSchema, args);
+    const value = typeof args === 'string' ? JSON.parse(args) : args;
+    const { success, output } = validateInput(toolArgumentsSchema, value);
     if (!success) {
       throw new Error(`Invalid tool arguments: ${output}`);
     }
