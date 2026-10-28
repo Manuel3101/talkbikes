@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   toolArgumentsSchema,
   validateInput,
-  type BikeAvailabilityTool,
-  type StationInformationTool,
-  type StationStatusTool,
+  type MapData as ProcessedToolData,
   type ToolArguments,
   type ToolDefinition,
 } from '@talkbikes/shared';
@@ -12,7 +10,7 @@ import { GbfsService } from '../gbfs/gbfs.service.ts';
 
 export type AppTool = {
   definition: ToolDefinition;
-  handler: (arguments_: ToolArguments) => Promise<unknown>;
+  handler: (arguments_: ToolArguments) => Promise<ProcessedToolData>;
 };
 
 @Injectable()
@@ -86,8 +84,7 @@ export class ToolsService {
     this.definitions = this.tools.map(tool => tool.definition);
   }
 
-  // TODO: should be properly typed
-  async execute(name: string, args: unknown): Promise<unknown> {
+  async execute(name: string, args: unknown): Promise<ProcessedToolData> {
     const tool = this.tools.find(currentTool => currentTool.definition.function.name === name);
     if (!tool) {
       throw new Error(`Unknown tool: ${name}`);
@@ -105,12 +102,7 @@ export class ToolsService {
     return output;
   }
 
-  private async getBikeAvailability(args: ToolArguments): Promise<BikeAvailabilityTool> {
-    const location = args.location;
-    if (typeof location !== 'string' || location.trim() === '') {
-      throw new Error('The location argument must be a non-empty string.');
-    }
-
+  private async getBikeAvailability(_args: ToolArguments): Promise<ProcessedToolData> {
     const result = await this.gbfsService.getBikeAvailability();
     if (!result) {
       return {
@@ -119,27 +111,29 @@ export class ToolsService {
       };
     }
 
-    const { data } = result;
-    const response: BikeAvailabilityTool = { success: true, availableBikes: [] };
+    return {
+      success: true,
+      locations: result.data.bikes.flatMap(bike => {
+        if (bike.lat === undefined || bike.lon === undefined) {
+          return [];
+        }
 
-    for (const bike of data.bikes) {
-      response.availableBikes.push({
-        stationId: bike.station_id,
-        type: bike.vehicle_type_id ?? 'unknown',
-        latitude: bike.lat,
-        longitude: bike.lon,
-      });
-    }
-
-    return response;
+        return [
+          {
+            latitude: bike.lat,
+            longitude: bike.lon,
+            details: {
+              kind: 'bike',
+              vehicleType: bike.vehicle_type_id ?? 'unknown',
+              ...(bike.station_id ? { stationId: bike.station_id } : {}),
+            },
+          },
+        ];
+      }),
+    };
   }
 
-  private async getStationInformation(args: ToolArguments): Promise<StationInformationTool> {
-    const location = args.location;
-    if (typeof location !== 'string' || location.trim() === '') {
-      throw new Error('The location argument must be a non-empty string.');
-    }
-
+  private async getStationInformation(_args: ToolArguments): Promise<ProcessedToolData> {
     const result = await this.gbfsService.getStationInformation();
     if (!result) {
       return {
@@ -148,50 +142,65 @@ export class ToolsService {
       };
     }
 
-    const { data } = result;
-    const response: StationInformationTool = { success: true, stations: [] };
-
-    for (const station of data.stations) {
-      response.stations.push({
-        id: station.station_id,
-        latitude: station.lat,
-        longitude: station.lon,
-        name: station.name,
-        address: station.address,
-      });
-    }
-
-    return response;
+    return {
+      success: true,
+      locations: result.data.stations.flatMap(station => {
+        return [
+          {
+            latitude: station.lat,
+            longitude: station.lon,
+            details: {
+              kind: 'station',
+              id: station.station_id,
+              name: station.name,
+              address: station.address,
+            },
+          },
+        ];
+      }),
+    };
   }
 
-  private async getStationStatus(args: ToolArguments): Promise<StationStatusTool> {
-    const location = args.location;
-    if (typeof location !== 'string' || location.trim() === '') {
-      throw new Error('The location argument must be a non-empty string.');
-    }
-
-    const result = await this.gbfsService.getStationStatus();
-    if (!result) {
+  private async getStationStatus(_args: ToolArguments): Promise<ProcessedToolData> {
+    const [statusResult, informationResult] = await Promise.all([
+      this.gbfsService.getStationStatus(),
+      this.gbfsService.getStationInformation(),
+    ]);
+    if (!statusResult || !informationResult) {
       return {
         success: false,
         error: 'Failed to retrieve station status data.',
       };
     }
 
-    const { data } = result;
-    const response: StationStatusTool = { success: true, stations: [] };
+    const stationsById = new Map(informationResult.data.stations.map(station => [station.station_id, station]));
 
-    for (const station of data.stations) {
-      response.stations.push({
-        id: station.station_id,
-        isInstalled: station.is_installed,
-        isRenting: station.is_renting,
-        isReturning: station.is_returning,
-        numBikesAvailable: station.num_bikes_available,
-        numDocksAvailable: station.num_docks_available,
-      });
-    }
+    return {
+      success: true,
+      locations: statusResult.data.stations.flatMap(station => {
+        const information = stationsById.get(station.station_id);
+        if (!information) {
+          return [];
+        }
 
-    return response;
+        return [
+          {
+            latitude: information.lat,
+            longitude: information.lon,
+            details: {
+              kind: 'station',
+              id: station.station_id,
+              name: information.name,
+              numBikesAvailable: station.num_bikes_available,
+              numDocksAvailable: station.num_docks_available,
+              isInstalled: station.is_installed,
+              isRenting: station.is_renting,
+              isReturning: station.is_returning,
+              adress: information.address,
+            },
+          },
+        ];
+      }),
+    };
   }
 }

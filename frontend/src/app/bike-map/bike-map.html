@@ -1,0 +1,14 @@
+<section class="overflow-hidden rounded-2xl border border-white/10 bg-[#111114] shadow-2xl shadow-black/20">
+  <div class="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-6">
+    <div>
+      <h2 class="text-sm font-medium text-zinc-100">Bike locations</h2>
+      <p class="mt-0.5 text-xs text-zinc-500">{{ locations().length }} results in {{ markers().length }} map markers</p>
+    </div>
+    <div class="flex items-center gap-3 text-xs text-zinc-400" aria-label="Map legend">
+      <span class="flex items-center gap-1.5"><i class="size-2 rounded-full bg-indigo-400"></i> Bike</span>
+      <span class="flex items-center gap-1.5"><i class="size-2 rounded-full bg-emerald-400"></i> Station</span>
+      <span class="flex items-center gap-1.5"><i class="size-2 rounded-full bg-amber-400"></i> Nearby results</span>
+    </div>
+  </div>
+  <div #map class="h-112 w-full" aria-label="Navigable street map of bike and station locations"></div>
+</section>

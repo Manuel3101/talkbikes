@@ -12,7 +12,10 @@ export class ChatService {
   async *send(question: string): AsyncGenerator<ChatMessage> {
     const response = await fetch(CHAT_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        Accept: 'application/x-ndjson',
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ question }),
     });
 

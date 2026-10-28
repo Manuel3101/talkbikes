@@ -25,59 +25,19 @@ export const modelToolCallSchema = v.object({
   }),
 });
 
-export type BikeAvailabilityTool = v.InferOutput<typeof bikeAvailabilityToolSchema>;
-export const bikeAvailabilityToolSchema = v.union([
-  v.object({
-    success: v.literal(true),
-    availableBikes: v.array(
-      v.object({
-        stationId: v.optional(v.string()),
-        type: v.string(),
-        latitude: v.optional(v.number()),
-        longitude: v.optional(v.number()),
-      }),
-    ),
-  }),
-  v.object({
-    success: v.literal(false),
-    error: v.string(),
-  }),
-]);
+export type MapLocation = v.InferOutput<typeof mapLocationSchema>;
+export const mapLocationSchema = v.object({
+  latitude: v.pipe(v.number(), v.minValue(-90), v.maxValue(90)),
+  longitude: v.pipe(v.number(), v.minValue(-180), v.maxValue(180)),
+  // TODO: define specific details per tool call when needed
+  details: v.record(v.string(), v.unknown()),
+});
 
-export type StationInformationTool = v.InferOutput<typeof stationInformationToolSchema>;
-export const stationInformationToolSchema = v.union([
+export type MapData = v.InferOutput<typeof mapDataSchema>;
+export const mapDataSchema = v.union([
   v.object({
     success: v.literal(true),
-    stations: v.array(
-      v.object({
-        id: v.string(),
-        name: v.string(),
-        latitude: v.number(),
-        longitude: v.number(),
-        address: v.optional(v.string()),
-      }),
-    ),
-  }),
-  v.object({
-    success: v.literal(false),
-    error: v.string(),
-  }),
-]);
-
-export type StationStatusTool = v.InferOutput<typeof stationStatusToolSchema>;
-export const stationStatusToolSchema = v.union([
-  v.object({
-    success: v.literal(true),
-    stations: v.array(
-      v.object({
-        id: v.string(),
-        numDocksAvailable: v.optional(v.number()),
-        numBikesAvailable: v.number(),
-        isInstalled: v.boolean(),
-        isRenting: v.boolean(),
-        isReturning: v.boolean(),
-      }),
-    ),
+    locations: v.array(mapLocationSchema),
   }),
   v.object({
     success: v.literal(false),

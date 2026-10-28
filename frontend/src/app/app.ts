@@ -1,14 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
-import type { ChatMessage, ProcessedToolData } from '@talkbikes/shared';
+import type { ChatMessage, MapData } from '@talkbikes/shared';
+import { BikeMap } from './bike-map/bike-map';
 import { ChatService } from './services/chat.service';
 import { SystemMessage as AssistantMessage } from './system-message/system-message';
 import { UserMessage } from './user-message/user-message';
 import { UserQuestion } from './user-question/user-question';
 
 @Component({
-  imports: [RouterOutlet, HlmMessageScrollerImports, AssistantMessage, UserMessage, UserQuestion],
+  imports: [RouterOutlet, HlmMessageScrollerImports, AssistantMessage, UserMessage, UserQuestion, BikeMap],
   selector: 'app-root',
   templateUrl: './app.html',
 })
@@ -16,6 +17,7 @@ export class App {
   private readonly chatService = inject(ChatService);
   protected readonly title = signal('Talkbikes');
   protected readonly isStreaming = signal(false);
+  protected readonly mapData = signal<MapData[]>([]);
   protected messages = signal<ChatMessage[]>([
     {
       id: '1',
@@ -31,12 +33,16 @@ export class App {
     }
 
     this.messages.update(messages => [...messages, { id: crypto.randomUUID(), role: 'user', content: question }]);
+    this.mapData.set([]);
     this.isStreaming.set(true);
 
     try {
       for await (const message of this.chatService.send(question)) {
-        this.messages.update(messages => {
-          const existingMessage = messages.some(currentMessage => currentMessage.id === message.id);
+        const toolData = message.tool_data;
+        if (message.role === 'tool' && toolData) {
+          this.mapData.update(data => [...data, toolData]);
+          continue;
+        }
 
         this.messages.update(messages => {
           const index = messages.findIndex(currentMessage => currentMessage.id === message.id);
@@ -47,7 +53,12 @@ export class App {
 
           const existingMessage = messages[index];
           return messages.map((currentMessage, i) =>
-            i === index ? { ...existingMessage, content: existingMessage.content + message.content } : currentMessage,
+            i === index
+              ? {
+                  ...existingMessage,
+                  content: existingMessage.content + message.content,
+                }
+              : currentMessage,
           );
         });
       }
@@ -58,7 +69,7 @@ export class App {
         {
           id: crypto.randomUUID(),
           role: 'system',
-          content: 'I could not send that question. Please try again.',
+          content: 'Die Antwort konnte nicht geladen werden. Bitte versuchen Sie es erneut.',
         },
       ]);
     } finally {

@@ -72,6 +72,13 @@
       </footer>
     </div>
   </section>
+  @defer (when mapData().length > 0) {
+  <section aria-label="Bike locations" class="mx-auto w-full max-w-5xl px-3 pb-4 sm:px-6 sm:pb-6">
+    <app-bike-map [toolData]="mapData()" />
+  </section>
+  } @error {
+  <p>Probleme beim laden der Karte</p>
+  }
 </main>
 
 <router-outlet />

@@ -41,6 +41,7 @@ export class Ndjson {
   private parseMessage(value: unknown): ChatMessage {
     const { success, output } = validateInput(chatMessageSchema, value);
     if (!success) {
+      console.error('Invalid chat message:', output);
       throw new Error(`Invalid chat message: ${output}`);
     }
 

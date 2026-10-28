@@ -28,6 +28,7 @@
     "@talkbikes/shared": "workspace:",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "maplibre-gl": "^6.14.0",
     "rxjs": "~7.8.0",
     "tailwind-merge": "^3.5.0",
     "tslib": "^2.3.0"
@@ -40,6 +41,7 @@
     "@angular/language-service": "^22.2.2",
     "@spartan-ng/cli": "^1.6.3",
     "@tailwindcss/postcss": "^4.1.12",
+    "@types/geojson": "^7946.0.16",
     "jsdom": "^30.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.12",

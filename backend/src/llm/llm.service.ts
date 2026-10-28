@@ -69,6 +69,14 @@ export class LlmService {
           tool_name: toolCall.function.name,
           content: JSON.stringify(data),
         });
+
+        yield {
+          id,
+          role: 'tool',
+          tool_name: toolCall.function.name,
+          content: '',
+          tool_data: data,
+        };
       }
     }
   }
