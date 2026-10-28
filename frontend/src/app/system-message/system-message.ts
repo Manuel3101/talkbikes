@@ -1,11 +1,13 @@
 import { Component, input } from '@angular/core';
-import { ChatMessage } from '@talkbikes/shared';
+import { ChatMessage, MapData } from '@talkbikes/shared';
+import { BikeMap } from '../bike-map/bike-map';
 
 @Component({
-  imports: [],
+  imports: [BikeMap],
   selector: 'app-system-message',
   templateUrl: './system-message.html',
 })
 export class SystemMessage {
-  public message = input.required<ChatMessage>();
+  public readonly message = input.required<ChatMessage>();
+  public readonly mapData = input<MapData[]>([]);
 }
