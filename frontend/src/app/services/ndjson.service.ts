@@ -31,8 +31,6 @@ export class Ndjson {
       if (buffer.trim()) {
         yield this.parseMessage(JSON.parse(buffer));
       }
-    } catch (error: unknown) {
-      console.error('Error parsing NDJSON:', error);
     } finally {
       stream.releaseLock();
     }

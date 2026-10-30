@@ -67,8 +67,18 @@
         </div>
       </div>
 
+      @if (chatResponse.isLoading() || isStreaming()) {
+      <div class="border-t border-white/10 px-4 py-3 text-sm text-zinc-500 sm:px-6" role="status" aria-live="polite">
+        Antwort wird erstellt ...
+      </div>
+      }
+
       <footer class="border-t border-white/10 bg-[#0d0d10] p-3 sm:p-4">
-        <app-user-question [isSubmitting]="isStreaming()" (questionSubmitted)="submitQuestion($event)" />
+        <app-user-question
+          [(question)]="draftQuestion"
+          [isSubmitting]="isStreaming()"
+          (questionSubmitted)="submitQuestion()"
+        />
       </footer>
     </div>
   </section>

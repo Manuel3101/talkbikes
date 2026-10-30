@@ -1,14 +1,15 @@
 <form
   class="mx-auto flex w-full max-w-3xl items-end gap-2 rounded-xl border border-white/10 bg-[#17171b] p-2 shadow-inner shadow-black/20"
   [attr.aria-busy]="isSubmitting()"
-  (submit)="submit($event, questionInput)"
+  (submit)="submit($event)"
 >
-  <label class="sr-only" for="chat-message">Stelle eine Frage an den GBFS Assistenten</label>
+  <label class="sr-only" for="chat-message">Stelle eine Frage an Talkbikes</label>
   <textarea
-    #questionInput
     id="chat-message"
+    [value]="question()"
+    (input)="question.set($any($event.target).value)"
     rows="1"
-    placeholder="Stelle eine Frage an den GBFS Assistenten"
+    placeholder="Stelle Talkbikes eine Frage"
     class="max-h-32 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
   ></textarea>
   <button

@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 
 @Component({
   imports: [],
@@ -7,17 +7,16 @@ import { Component, input, output } from '@angular/core';
 })
 export class UserQuestion {
   readonly isSubmitting = input(false);
-  readonly questionSubmitted = output<string>();
+  readonly question = model('');
+  readonly questionSubmitted = output<void>();
 
-  protected submit(event: SubmitEvent, textarea: HTMLTextAreaElement): void {
+  protected submit(event: SubmitEvent): void {
     event.preventDefault();
 
-    const question = textarea.value.trim();
-    if (!question || this.isSubmitting()) {
+    if (!this.question().trim() || this.isSubmitting()) {
       return;
     }
 
-    this.questionSubmitted.emit(question);
-    textarea.value = '';
+    this.questionSubmitted.emit();
   }
 }

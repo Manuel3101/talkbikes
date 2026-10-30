@@ -9,7 +9,7 @@ const CHAT_ENDPOINT = 'http://localhost:3000/chat';
 export class ChatService {
   private ndjson = inject(Ndjson);
   // TODO: add options object for things like "stream=true"
-  async *send(question: string): AsyncGenerator<ChatMessage> {
+  async *send(question: string, signal?: AbortSignal): AsyncGenerator<ChatMessage> {
     const response = await fetch(CHAT_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -17,6 +17,7 @@ export class ChatService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ question }),
+      signal,
     });
 
     if (!response.ok) {
