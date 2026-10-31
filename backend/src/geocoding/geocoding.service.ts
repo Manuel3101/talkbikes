@@ -6,6 +6,8 @@ type NominatimSearchResult = {
   lon: string;
 };
 
+const REQUEST_TIMEOUT_MS = 10_000;
+
 @Injectable()
 export class GeocodingService {
   async findCoordinates(location: string): Promise<Coordinates | null> {
@@ -19,6 +21,7 @@ export class GeocodingService {
         headers: {
           'User-Agent': 'Talkbikes/1.0',
         },
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
       if (!response.ok) {
         return null;
