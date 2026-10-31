@@ -86,11 +86,9 @@ export class BikeMap implements AfterViewInit, OnDestroy {
       }
 
       const cluster = [first];
-      for (const location of cluster) {
-        for (let index = remaining.length - 1; index >= 0; index -= 1) {
-          if (distanceInMeters(location, remaining[index]) <= CLUSTER_DISTANCE_METERS) {
-            cluster.push(remaining.splice(index, 1)[0]);
-          }
+      for (let index = remaining.length - 1; index >= 0; index -= 1) {
+        if (distanceInMeters(first, remaining[index]) <= CLUSTER_DISTANCE_METERS) {
+          cluster.push(remaining.splice(index, 1)[0]);
         }
       }
       clusters.push(cluster);
