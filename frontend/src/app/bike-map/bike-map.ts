@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, computed, ElementRef, inject, input, OnDestroy, viewChild } from '@angular/core';
-import type { MapData, MapLocation } from '@talkbikes/shared';
+import { AfterViewInit, Component, computed, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
+import { distanceInMeters, type MapData, type MapLocation } from '@talkbikes/shared';
 import type { FeatureCollection, Point } from 'geojson';
 import { getVersion, LngLatBounds, Map, NavigationControl, setWorkerUrl, type GeoJSONSource } from 'maplibre-gl';
 import {
@@ -8,7 +8,6 @@ import {
   LOCATIONS_LAYER_ID,
   LOCATIONS_SOURCE_ID,
 } from '../constants';
-import { Location } from '../services/location';
 import { MapFeatureProperties, MapMarker } from '../services/types';
 
 setWorkerUrl(new URL(`maplibre-gl-worker.mjs?v=${getVersion()}`, document.baseURI).toString());
@@ -18,7 +17,6 @@ setWorkerUrl(new URL(`maplibre-gl-worker.mjs?v=${getVersion()}`, document.baseUR
   templateUrl: './bike-map.html',
 })
 export class BikeMap implements AfterViewInit, OnDestroy {
-  private location = inject(Location);
   public readonly toolData = input.required<MapData[]>();
 
   private readonly mapElement = viewChild.required<ElementRef<HTMLDivElement>>('map');
@@ -98,7 +96,7 @@ export class BikeMap implements AfterViewInit, OnDestroy {
 
     for (let first = 0; first < locations.length; first += 1) {
       for (let second = first + 1; second < locations.length; second += 1) {
-        if (this.location.distanceInMeters(locations[first], locations[second]) <= CLUSTER_DISTANCE_METERS) {
+        if (distanceInMeters(locations[first], locations[second]) <= CLUSTER_DISTANCE_METERS) {
           join(first, second);
         }
       }

@@ -1,7 +1,10 @@
 import * as v from 'valibot';
 
 export type ToolArguments = v.InferOutput<typeof toolArgumentsSchema>;
-export const toolArgumentsSchema = v.record(v.string(), v.unknown());
+export const toolArgumentsSchema = v.object({
+  location: v.pipe(v.string(), v.minLength(1)),
+  distance: v.optional(v.pipe(v.number(), v.minValue(0))),
+});
 
 export type ToolDefinition = v.InferOutput<typeof toolDefinitionSchema>;
 export const toolDefinitionSchema = v.object({
@@ -21,7 +24,7 @@ export type ModelToolCall = v.InferOutput<typeof modelToolCallSchema>;
 export const modelToolCallSchema = v.object({
   function: v.object({
     name: v.string(),
-    arguments: toolArgumentsSchema,
+    arguments: v.record(v.string(), v.any()),
   }),
 });
 

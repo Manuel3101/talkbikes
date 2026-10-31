@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import {
+  distanceInMeters,
   toolArgumentsSchema,
   validateInput,
+  type MapLocation,
   type MapData as ProcessedToolData,
   type ToolArguments,
   type ToolDefinition,
 } from '@talkbikes/shared';
 import { GbfsService } from '../gbfs/gbfs.service.ts';
+import { GeocodingService } from '../geocoding/geocoding.service.ts';
 
 export type AppTool = {
   definition: ToolDefinition;
@@ -18,7 +21,10 @@ export class ToolsService {
   readonly tools: AppTool[] = [];
   readonly definitions: ToolDefinition[] = [];
 
-  constructor(private readonly gbfsService: GbfsService) {
+  constructor(
+    private readonly gbfsService: GbfsService,
+    private readonly geocodingService: GeocodingService,
+  ) {
     this.tools = [
       {
         definition: {
@@ -32,6 +38,10 @@ export class ToolsService {
                 location: {
                   type: 'string',
                   description: 'The station, address, or place to check.',
+                },
+                distance: {
+                  type: 'number',
+                  description: 'Optional maximum straight-line distance from location, in meters.',
                 },
               },
               required: ['location'],
@@ -53,6 +63,10 @@ export class ToolsService {
                   type: 'string',
                   description: 'The station id, name or shortname.',
                 },
+                distance: {
+                  type: 'number',
+                  description: 'Optional maximum straight-line distance from location, in meters.',
+                },
               },
               required: ['location'],
             },
@@ -73,6 +87,10 @@ export class ToolsService {
                   type: 'string',
                   description: 'The station id',
                 },
+                distance: {
+                  type: 'number',
+                  description: 'Optional maximum straight-line distance from location, in meters.',
+                },
               },
               required: ['location'],
             },
@@ -90,7 +108,21 @@ export class ToolsService {
       throw new Error(`Unknown tool: ${name}`);
     }
 
-    return tool.handler(this.parseArguments(args));
+    return await tool.handler(this.parseArguments(args));
+  }
+
+  private async filterByDistance(data: MapLocation[], args: ToolArguments): Promise<MapLocation[]> {
+    const distance = args.distance;
+    if (!Number.isFinite(distance) || !distance) {
+      return data;
+    }
+
+    const origin = await this.geocodingService.findCoordinates(args.location);
+    if (!origin) {
+      throw new Error(`Could not find coordinates for location: ${args.location}`);
+    }
+
+    return data.filter(location => distanceInMeters(origin, location) <= distance);
   }
 
   private parseArguments(args: unknown): ToolArguments {
@@ -102,7 +134,7 @@ export class ToolsService {
     return output;
   }
 
-  private async getBikeAvailability(_args: ToolArguments): Promise<ProcessedToolData> {
+  private async getBikeAvailability(args: ToolArguments): Promise<ProcessedToolData> {
     const result = await this.gbfsService.getBikeAvailability();
     if (!result) {
       return {
@@ -110,30 +142,31 @@ export class ToolsService {
         error: 'Failed to retrieve bike availability data.',
       };
     }
+    const locations = result.data.bikes.flatMap(bike => {
+      if (bike.lat === undefined || bike.lon === undefined) {
+        return [];
+      }
+
+      return [
+        {
+          latitude: bike.lat,
+          longitude: bike.lon,
+          details: {
+            kind: 'bike',
+            vehicleType: bike.vehicle_type_id ?? 'unknown',
+            ...(bike.station_id ? { stationId: bike.station_id } : {}),
+          },
+        },
+      ];
+    });
 
     return {
       success: true,
-      locations: result.data.bikes.flatMap(bike => {
-        if (bike.lat === undefined || bike.lon === undefined) {
-          return [];
-        }
-
-        return [
-          {
-            latitude: bike.lat,
-            longitude: bike.lon,
-            details: {
-              kind: 'bike',
-              vehicleType: bike.vehicle_type_id ?? 'unknown',
-              ...(bike.station_id ? { stationId: bike.station_id } : {}),
-            },
-          },
-        ];
-      }),
+      locations: args.distance ? await this.filterByDistance(locations, args) : locations,
     };
   }
 
-  private async getStationInformation(_args: ToolArguments): Promise<ProcessedToolData> {
+  private async getStationInformation(args: ToolArguments): Promise<ProcessedToolData> {
     const result = await this.gbfsService.getStationInformation();
     if (!result) {
       return {
@@ -141,27 +174,27 @@ export class ToolsService {
         error: 'Failed to retrieve station information data.',
       };
     }
-
+    const locations = result.data.stations.flatMap(station => {
+      return [
+        {
+          latitude: station.lat,
+          longitude: station.lon,
+          details: {
+            kind: 'station',
+            id: station.station_id,
+            name: station.name,
+            address: station.address,
+          },
+        },
+      ];
+    });
     return {
       success: true,
-      locations: result.data.stations.flatMap(station => {
-        return [
-          {
-            latitude: station.lat,
-            longitude: station.lon,
-            details: {
-              kind: 'station',
-              id: station.station_id,
-              name: station.name,
-              address: station.address,
-            },
-          },
-        ];
-      }),
+      locations: args.distance ? await this.filterByDistance(locations, args) : locations,
     };
   }
 
-  private async getStationStatus(_args: ToolArguments): Promise<ProcessedToolData> {
+  private async getStationStatus(args: ToolArguments): Promise<ProcessedToolData> {
     const [statusResult, informationResult] = await Promise.all([
       this.gbfsService.getStationStatus(),
       this.gbfsService.getStationInformation(),
@@ -174,33 +207,33 @@ export class ToolsService {
     }
 
     const stationsById = new Map(informationResult.data.stations.map(station => [station.station_id, station]));
+    const locations = statusResult.data.stations.flatMap(station => {
+      const information = stationsById.get(station.station_id);
+      if (!information) {
+        return [];
+      }
 
+      return [
+        {
+          latitude: information.lat,
+          longitude: information.lon,
+          details: {
+            kind: 'station',
+            id: station.station_id,
+            name: information.name,
+            numBikesAvailable: station.num_bikes_available,
+            numDocksAvailable: station.num_docks_available,
+            isInstalled: station.is_installed,
+            isRenting: station.is_renting,
+            isReturning: station.is_returning,
+            address: information.address,
+          },
+        },
+      ];
+    });
     return {
       success: true,
-      locations: statusResult.data.stations.flatMap(station => {
-        const information = stationsById.get(station.station_id);
-        if (!information) {
-          return [];
-        }
-
-        return [
-          {
-            latitude: information.lat,
-            longitude: information.lon,
-            details: {
-              kind: 'station',
-              id: station.station_id,
-              name: information.name,
-              numBikesAvailable: station.num_bikes_available,
-              numDocksAvailable: station.num_docks_available,
-              isInstalled: station.is_installed,
-              isRenting: station.is_renting,
-              isReturning: station.is_returning,
-              adress: information.address,
-            },
-          },
-        ];
-      }),
+      locations: args.distance ? await this.filterByDistance(locations, args) : locations,
     };
   }
 }
