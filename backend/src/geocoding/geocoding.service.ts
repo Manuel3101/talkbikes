@@ -11,6 +11,10 @@ const REQUEST_TIMEOUT_MS = 10_000;
 @Injectable()
 export class GeocodingService {
   async findCoordinates(location: string): Promise<Coordinates | null> {
+    if (!location.trim()) {
+      return null;
+    }
+
     const url = new URL('https://nominatim.openstreetmap.org/search');
     url.searchParams.set('q', location);
     url.searchParams.set('format', 'jsonv2');
