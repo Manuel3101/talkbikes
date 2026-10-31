@@ -23,7 +23,9 @@ export class BikeMap implements AfterViewInit, OnDestroy {
   private map: Map | undefined;
   private mapReady = false;
 
-  protected readonly locations = computed(() => this.getLocations(this.toolData()));
+  protected readonly locations = computed(() =>
+    this.toolData().flatMap(result => (result.success ? result.locations : [])),
+  );
   protected readonly markers = computed(() => this.clusterLocations(this.locations()));
 
   ngAfterViewInit(): void {
@@ -73,47 +75,43 @@ export class BikeMap implements AfterViewInit, OnDestroy {
     this.map?.remove();
   }
 
-  private getLocations(toolData: MapData[]): MapLocation[] {
-    return toolData.flatMap(result => (result.success ? result.locations : []));
-  }
-
   private clusterLocations(locations: MapLocation[]): MapMarker[] {
-    const parents = locations.map((_, index) => index);
-    const find = (index: number): number => {
-      if (parents[index] !== index) {
-        parents[index] = find(parents[index]);
+    const remaining = [...locations];
+    const clusters: MapLocation[][] = [];
+
+    while (remaining.length > 0) {
+      const first = remaining.shift();
+      if (!first) {
+        break;
       }
 
-      return parents[index];
-    };
-    const join = (first: number, second: number): void => {
-      const firstRoot = find(first);
-      const secondRoot = find(second);
-      if (firstRoot !== secondRoot) {
-        parents[secondRoot] = firstRoot;
-      }
-    };
-
-    for (let first = 0; first < locations.length; first += 1) {
-      for (let second = first + 1; second < locations.length; second += 1) {
-        if (distanceInMeters(locations[first], locations[second]) <= CLUSTER_DISTANCE_METERS) {
-          join(first, second);
+      const cluster = [first];
+      for (const location of cluster) {
+        for (let index = remaining.length - 1; index >= 0; index -= 1) {
+          if (distanceInMeters(location, remaining[index]) <= CLUSTER_DISTANCE_METERS) {
+            cluster.push(remaining.splice(index, 1)[0]);
+          }
         }
       }
+      clusters.push(cluster);
     }
 
-    const clusters = new globalThis.Map<number, MapLocation[]>();
-    locations.forEach((location, index) => {
-      const root = find(index);
-      clusters.set(root, [...(clusters.get(root) ?? []), location]);
-    });
+    return clusters.map(cluster => {
+      const totals = cluster.reduce(
+        (sum, location) => ({
+          latitude: sum.latitude + location.latitude,
+          longitude: sum.longitude + location.longitude,
+        }),
+        { latitude: 0, longitude: 0 },
+      );
 
-    return [...clusters.values()].map(cluster => ({
-      latitude: cluster.reduce((total, location) => total + location.latitude, 0) / cluster.length,
-      longitude: cluster.reduce((total, location) => total + location.longitude, 0) / cluster.length,
-      count: cluster.length,
-      locations: cluster,
-    }));
+      return {
+        latitude: totals.latitude / cluster.length,
+        longitude: totals.longitude / cluster.length,
+        count: cluster.length,
+        locations: cluster,
+      };
+    });
   }
 
   private updateMap(locations: MapLocation[], markers: MapMarker[]): void {
