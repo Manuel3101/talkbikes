@@ -16,8 +16,6 @@ export class AppController {
     @Body({ schema: userQuestionSchema, pipes: [StandardSchemaValidationPipe] }) body: UserQuestion,
     @Res() response: Response,
   ): Promise<void> {
-    response.flushHeaders();
-
     try {
       for await (const message of this.llmService.streamChat(body.question)) {
         if (response.destroyed) {
