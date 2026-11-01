@@ -90,5 +90,8 @@ jobs:
               with:
                   cache: true
 
+            - name: build shared
+              run: node --run build
+
             - name: Run tests
               run: node --run test
