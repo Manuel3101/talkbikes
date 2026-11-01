@@ -49,7 +49,7 @@
               @for (message of messages(); track message.id) { @if (message.role === 'system' || message.role ===
               'assistant') {
               <div hlmMessageScrollerItem [messageId]="message.id" [scrollAnchor]="false">
-                <app-system-message [message]="message" [mapData]="mapDataFor(message.id)" />
+                <app-system-message [message]="message" [mapData]="mapDataByMessageId()[message.id] ?? []" />
               </div>
               } @else {
               <div

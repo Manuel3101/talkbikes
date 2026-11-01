@@ -38,6 +38,9 @@ export class App {
   protected readonly draftQuestion = signal('');
   private readonly submittedQuestion = signal<ChatRequest | undefined>(undefined);
   protected readonly isStreaming = signal(false);
+  /**
+   * Receives response chunks which triggers `messages` to recompute
+   */
   protected readonly chatResponse = resource<ChatMessage | undefined, ChatRequest | undefined>({
     params: () => this.submittedQuestion(),
     stream: ({ params, abortSignal }) => {
@@ -65,7 +68,10 @@ export class App {
     },
   });
 
-  private readonly mapDataByMessageId = linkedSignal<ChatMessage | undefined, Record<string, MapData[]>>({
+  /**
+   *  Tracks `tool_data` for each message by its `id`
+   */
+  protected readonly mapDataByMessageId = linkedSignal<ChatMessage | undefined, Record<string, MapData[]>>({
     source: () => this.chatResponse.value(),
     computation: (message, previous) => {
       const dataByMessageId = previous?.value ?? {};
@@ -92,10 +98,6 @@ export class App {
     this.draftQuestion.set('');
     this.isStreaming.set(true);
     this.submittedQuestion.set({ question });
-  }
-
-  protected mapDataFor(messageId: string): MapData[] {
-    return this.mapDataByMessageId()[messageId] ?? [];
   }
 
   private appendMessage(messages: ChatMessage[], message: ChatMessage): ChatMessage[] {
