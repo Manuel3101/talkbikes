@@ -1,16 +1,12 @@
 import { Component, inject, linkedSignal, resource, ResourceStreamItem, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
-import type { ChatMessage, MapData } from '@talkbikes/shared';
+import type { ChatMessage, UserQuestion as ChatRequest, MapData } from '@talkbikes/shared';
 
 import { ChatService } from './services/chat.service';
 import { SystemMessage as AssistantMessage } from './system-message/system-message';
 import { UserMessage } from './user-message/user-message';
 import { UserQuestion } from './user-question/user-question';
-
-type ChatRequest = {
-  question: string;
-};
 
 const INITIAL_MESSAGES: ChatMessage[] = [
   {
