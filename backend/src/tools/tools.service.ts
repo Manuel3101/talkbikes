@@ -55,7 +55,7 @@ export class ToolsService {
           type: 'function',
           function: {
             name: 'get_station_information',
-            description: 'Find information about a specific station.',
+            description: 'Get information about stations.',
             parameters: {
               type: 'object',
               properties: {
@@ -79,7 +79,7 @@ export class ToolsService {
           type: 'function',
           function: {
             name: 'get_station_status',
-            description: 'Get current status about a specific station.',
+            description: 'Get current status of stations.',
             parameters: {
               type: 'object',
               properties: {
