@@ -27,23 +27,3 @@ export const modelToolCallSchema = v.object({
     arguments: v.record(v.string(), v.any()),
   }),
 });
-
-export type MapLocation = v.InferOutput<typeof mapLocationSchema>;
-export const mapLocationSchema = v.object({
-  latitude: v.pipe(v.number(), v.minValue(-90), v.maxValue(90)),
-  longitude: v.pipe(v.number(), v.minValue(-180), v.maxValue(180)),
-  // TODO: define specific details per tool call when needed
-  details: v.record(v.string(), v.unknown()),
-});
-
-export type MapData = v.InferOutput<typeof mapDataSchema>;
-export const mapDataSchema = v.union([
-  v.object({
-    success: v.literal(true),
-    locations: v.array(mapLocationSchema),
-  }),
-  v.object({
-    success: v.literal(false),
-    error: v.string(),
-  }),
-]);

@@ -142,7 +142,7 @@ export class ToolsService {
         error: 'Failed to retrieve bike availability data.',
       };
     }
-    const locations = result.data.bikes.flatMap(bike => {
+    const locations: MapLocation[] = result.data.bikes.flatMap(bike => {
       if (bike.lat === undefined || bike.lon === undefined) {
         return [];
       }
@@ -153,8 +153,7 @@ export class ToolsService {
           longitude: bike.lon,
           details: {
             kind: 'bike',
-            vehicleType: bike.vehicle_type_id ?? 'unknown',
-            ...(bike.station_id ? { stationId: bike.station_id } : {}),
+            properties: { id: bike.bike_id, ...bike },
           },
         },
       ];
@@ -174,16 +173,18 @@ export class ToolsService {
         error: 'Failed to retrieve station information data.',
       };
     }
-    const locations = result.data.stations.flatMap(station => {
+    const locations: MapLocation[] = result.data.stations.flatMap(station => {
+      if (station.lat === undefined || station.lon === undefined) {
+        return [];
+      }
+
       return [
         {
           latitude: station.lat,
           longitude: station.lon,
           details: {
             kind: 'station',
-            id: station.station_id,
-            name: station.name,
-            address: station.address,
+            properties: { id: station.station_id, ...station },
           },
         },
       ];
@@ -207,7 +208,7 @@ export class ToolsService {
     }
 
     const stationsById = new Map(informationResult.data.stations.map(station => [station.station_id, station]));
-    const locations = statusResult.data.stations.flatMap(station => {
+    const locations: MapLocation[] = statusResult.data.stations.flatMap(station => {
       const information = stationsById.get(station.station_id);
       if (!information) {
         return [];
@@ -219,14 +220,11 @@ export class ToolsService {
           longitude: information.lon,
           details: {
             kind: 'station',
-            id: station.station_id,
-            name: information.name,
-            numBikesAvailable: station.num_bikes_available,
-            numDocksAvailable: station.num_docks_available,
-            isInstalled: station.is_installed,
-            isRenting: station.is_renting,
-            isReturning: station.is_returning,
-            address: information.address,
+            properties: {
+              id: station.station_id,
+              ...station,
+              ...information,
+            },
           },
         },
       ];

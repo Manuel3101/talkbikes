@@ -1,5 +1,6 @@
 import * as v from 'valibot';
-import { mapDataSchema, modelToolCallSchema } from './tools.ts';
+import { mapDataSchema } from './map.ts';
+import { modelToolCallSchema } from './tools.ts';
 
 export type ChatMessage = v.InferOutput<typeof chatMessageSchema>;
 export const chatMessageSchema = v.object({

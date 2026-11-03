@@ -1,4 +1,4 @@
-import type { MapLocation } from './schemas/tools.ts';
+import type { MapLocation } from './schemas/map.ts';
 
 const EARTH_RADIUS_METERS = 6_371_000;
 
