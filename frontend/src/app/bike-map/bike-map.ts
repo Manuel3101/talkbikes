@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, computed, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
 import type { MapData, MapFeatureProperties, MapLocation } from '@talkbikes/shared';
 import type { FeatureCollection, Point } from 'geojson';
 import { getVersion, LngLatBounds, Map, NavigationControl, setWorkerUrl, type GeoJSONSource } from 'maplibre-gl';
@@ -21,6 +21,10 @@ export class BikeMap implements AfterViewInit, OnDestroy {
     this.toolData().flatMap(result => (result.success ? result.locations : [])),
   );
   protected readonly markers = computed(() => this.locations());
+
+  constructor() {
+    effect(() => this.updateMap(this.locations()));
+  }
 
   ngAfterViewInit(): void {
     this.map = new Map({
