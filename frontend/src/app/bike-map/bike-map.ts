@@ -47,8 +47,8 @@ export class BikeMap implements AfterViewInit, OnDestroy {
         type: 'circle',
         source: LOCATIONS_SOURCE_ID,
         paint: {
-          'circle-color': ['case', ['>', ['get', 'count'], 1], '#f59e0b', '#34d399'],
-          'circle-radius': ['case', ['>', ['get', 'count'], 1], 13, 6],
+          'circle-color': ['case', ['has', 'point_count'], '#fbbf24', '#34d399'],
+          'circle-radius': ['case', ['has', 'point_count'], 13, 6],
           'circle-stroke-color': '#ffffff',
           'circle-stroke-width': 2,
         },
@@ -58,7 +58,7 @@ export class BikeMap implements AfterViewInit, OnDestroy {
         type: 'symbol',
         source: LOCATIONS_SOURCE_ID,
         layout: {
-          'text-field': ['case', ['>', ['get', 'count'], 1], ['to-string', ['get', 'count']], ''],
+          'text-field': ['case', ['has', 'point_count'], ['to-string', ['get', 'point_count']], ''],
           'text-font': ['Noto Sans Regular'],
           'text-size': 11,
         },
