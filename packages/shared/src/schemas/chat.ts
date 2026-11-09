@@ -13,7 +13,11 @@ export const chatMessageSchema = v.object({
   tool_data: v.optional(mapDataSchema),
 });
 
+export type LlmProviderName = v.InferOutput<typeof llmProviderNameSchema>;
+export const llmProviderNameSchema = v.picklist(['ollama', 'cloudflare']);
+
 export type UserQuestion = v.InferOutput<typeof userQuestionSchema>;
 export const userQuestionSchema = v.object({
   question: v.string(),
+  provider: v.optional(llmProviderNameSchema),
 });

@@ -17,7 +17,9 @@ export class AppController {
     @Res() response: Response,
   ): Promise<void> {
     try {
-      for await (const message of this.llmService.streamChat(body.question)) {
+      for await (const message of this.llmService.orchestrateLlmRequest(body.question, {
+        provider: body.provider ?? 'ollama',
+      })) {
         if (response.destroyed) {
           return;
         }
@@ -26,6 +28,11 @@ export class AppController {
       }
     } catch (error: unknown) {
       console.error('Error while generating a response:', error);
+      if (response.headersSent) {
+        response.destroy();
+      } else {
+        response.status(500);
+      }
     } finally {
       response.end();
     }
