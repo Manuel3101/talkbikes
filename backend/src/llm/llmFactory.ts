@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { DEFAULT_LLM_PROVIDER, type LlmProviderName } from '@talkbikes/shared';
 import { CloudflareAdapter } from './adapter/cloudflare.ts';
 import { OllamaAdapter } from './adapter/ollama.ts';
 
@@ -12,7 +13,7 @@ export class LlmFactory {
   /**
    * @throws Error if the provider is not supported
    */
-  create(provider: 'ollama' | 'cloudflare' = 'ollama') {
+  create(provider: LlmProviderName = DEFAULT_LLM_PROVIDER) {
     switch (provider) {
       case 'ollama':
         return this.ollama;

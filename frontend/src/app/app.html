@@ -40,6 +40,13 @@
           <h2 id="conversation-title" class="text-sm font-medium text-zinc-100">Neuer Chat</h2>
           <p class="mt-0.5 text-xs text-zinc-500">Stelle Fragen über alles mögliche zur Mobilität</p>
         </div>
+        @if (providers.hasValue() && providers.value().length > 0) {
+        <app-provider-select
+          [providers]="providers.value()"
+          [disabled]="isStreaming()"
+          [(selected)]="selectedProvider"
+        />
+        }
       </div>
 
       <div hlmMessageScrollerProvider [autoScroll]="true" class="min-h-0 flex-1">
@@ -69,7 +76,7 @@
 
       @if (chatResponse.isLoading() || isStreaming()) {
       <div
-        class="border-t border-white/10 px-4 py-3 text-sm text-zinc-500 sm:px-6 animate-pulse"
+        class="animate-pulse border-t border-white/10 px-4 py-3 text-sm text-zinc-500 sm:px-6"
         role="status"
         aria-live="polite"
       >

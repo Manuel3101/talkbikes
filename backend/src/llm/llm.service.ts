@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import type { ChatMessage, LlmProviderName } from '@talkbikes/shared';
+import type { ChatMessage, LlmProviderInfo, LlmProviderName } from '@talkbikes/shared';
 import { SYSTEM_PROMPT } from '../constants.ts';
 import { LlmOrchestrator } from '../types/llmProvider.ts';
 import { LlmFactory } from './llmFactory.ts';
+import { LLM_PROVIDERS } from './providers.ts';
 
 @Injectable()
 export class LlmService implements LlmOrchestrator {
@@ -24,5 +25,9 @@ export class LlmService implements LlmOrchestrator {
     ];
     const provider = this.llmFactory.create(options.provider);
     yield* provider.streamChat({ id, messages });
+  }
+
+  public listProviders(): readonly LlmProviderInfo[] {
+    return LLM_PROVIDERS;
   }
 }

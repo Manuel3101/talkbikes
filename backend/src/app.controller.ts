@@ -1,11 +1,16 @@
-import { Body, Controller, Header, HttpCode, Post, Res, StandardSchemaValidationPipe } from '@nestjs/common';
-import { type UserQuestion, userQuestionSchema } from '@talkbikes/shared';
+import { Body, Controller, Get, Header, HttpCode, Post, Res, StandardSchemaValidationPipe } from '@nestjs/common';
+import { DEFAULT_LLM_PROVIDER, type LlmProviderInfo, type UserQuestion, userQuestionSchema } from '@talkbikes/shared';
 import type { Response } from 'express';
 import { LlmService } from './llm/llm.service.ts';
 
 @Controller()
 export class AppController {
   constructor(private readonly llmService: LlmService) {}
+
+  @Get('providers')
+  listProviders(): readonly LlmProviderInfo[] {
+    return this.llmService.listProviders();
+  }
 
   @Post('chat')
   @Header('Content-Type', 'application/x-ndjson; charset=utf-8')
@@ -18,7 +23,7 @@ export class AppController {
   ): Promise<void> {
     try {
       for await (const message of this.llmService.orchestrateLlmRequest(body.question, {
-        provider: body.provider ?? 'ollama',
+        provider: body.provider ?? DEFAULT_LLM_PROVIDER,
       })) {
         if (response.destroyed) {
           return;

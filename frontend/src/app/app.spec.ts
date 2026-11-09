@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+import { ChatService } from './services/chat.service';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+      providers: [{ provide: ChatService, useValue: { listProviders: async () => [] } }],
     }).compileComponents();
   });
 

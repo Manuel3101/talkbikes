@@ -1,8 +1,10 @@
 import { Component, inject, linkedSignal, resource, ResourceStreamItem, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
-import type { ChatMessage, UserQuestion as ChatRequest, MapData } from '@talkbikes/shared';
+import type { ChatMessage, UserQuestion as ChatRequest, LlmProviderName, MapData } from '@talkbikes/shared';
+import { DEFAULT_LLM_PROVIDER } from '@talkbikes/shared';
 
+import { ProviderSelect } from './provider-select/provider-select';
 import { ChatService } from './services/chat.service';
 import { SystemMessage as AssistantMessage } from './system-message/system-message';
 import { UserMessage } from './user-message/user-message';
@@ -18,7 +20,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
 ];
 
 @Component({
-  imports: [RouterOutlet, HlmMessageScrollerImports, AssistantMessage, UserMessage, UserQuestion],
+  imports: [RouterOutlet, HlmMessageScrollerImports, AssistantMessage, UserMessage, UserQuestion, ProviderSelect],
   selector: 'app-root',
   templateUrl: './app.html',
 })
@@ -32,6 +34,14 @@ export class App {
     },
   });
   protected readonly draftQuestion = signal('');
+  protected readonly selectedProvider = signal<LlmProviderName>(DEFAULT_LLM_PROVIDER);
+  /**
+   * Providers offered by the backend. If loading fails the selector is hidden
+   * and the backend falls back to its default provider.
+   */
+  protected readonly providers = resource({
+    loader: ({ abortSignal }) => this.chatService.listProviders(abortSignal),
+  });
   private readonly submittedQuestion = signal<ChatRequest | undefined>(undefined);
   protected readonly isStreaming = signal(false);
   /**
@@ -45,7 +55,7 @@ export class App {
 
       void (async () => {
         try {
-          for await (const chunk of this.chatService.send(params.question, abortSignal)) {
+          for await (const chunk of this.chatService.send(params, abortSignal)) {
             if (abortSignal.aborted) {
               return;
             }
@@ -93,7 +103,7 @@ export class App {
     this.messages.update(messages => [...messages, { id: crypto.randomUUID(), role: 'user', content: question }]);
     this.draftQuestion.set('');
     this.isStreaming.set(true);
-    this.submittedQuestion.set({ question });
+    this.submittedQuestion.set({ question, provider: this.selectedProvider() });
   }
 
   private appendMessage(messages: ChatMessage[], message: ChatMessage): ChatMessage[] {

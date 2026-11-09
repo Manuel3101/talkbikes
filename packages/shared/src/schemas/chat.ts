@@ -16,6 +16,15 @@ export const chatMessageSchema = v.object({
 export type LlmProviderName = v.InferOutput<typeof llmProviderNameSchema>;
 export const llmProviderNameSchema = v.picklist(['ollama', 'cloudflare']);
 
+export const DEFAULT_LLM_PROVIDER: LlmProviderName = 'ollama';
+
+export type LlmProviderInfo = v.InferOutput<typeof llmProviderInfoSchema>;
+export const llmProviderInfoSchema = v.object({
+  id: llmProviderNameSchema,
+  label: v.string(),
+  description: v.string(),
+});
+
 export type UserQuestion = v.InferOutput<typeof userQuestionSchema>;
 export const userQuestionSchema = v.object({
   question: v.string(),

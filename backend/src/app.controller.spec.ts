@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { llmProviderNameSchema } from '@talkbikes/shared';
 import { AppController } from './app.controller.ts';
 import { GbfsModule } from './gbfs/gbfs.module.ts';
 import { GeocodingModule } from './geocoding/geocoding.module.ts';
@@ -20,5 +21,15 @@ describe('AppController', () => {
 
   it('creates the controller with its dependencies', () => {
     expect(appController).toBeInstanceOf(AppController);
+  });
+
+  it('lists every supported provider with a label and description', () => {
+    const providers = appController.listProviders();
+
+    expect(providers.map(provider => provider.id)).toEqual(llmProviderNameSchema.options);
+    for (const provider of providers) {
+      expect(provider.label).not.toBe('');
+      expect(provider.description).not.toBe('');
+    }
   });
 });
