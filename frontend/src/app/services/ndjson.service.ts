@@ -1,5 +1,5 @@
 import { Service } from '@angular/core';
-import { ChatMessage, chatMessageSchema, validateInput } from '@talkbikes/shared';
+import { type ChatMessage, chatMessageSchema, validateInput } from '@talkbikes/shared';
 
 @Service()
 export class Ndjson {
@@ -37,10 +37,14 @@ export class Ndjson {
   }
 
   private parseMessage(value: unknown): ChatMessage {
-    const { success, output } = validateInput(chatMessageSchema, value);
+    const { success, output, issues } = validateInput(chatMessageSchema, value);
     if (!success) {
-      console.error('Invalid chat message:', output);
-      throw new Error(`Invalid chat message: ${output}`);
+      const details = issues
+        .slice(0, 5)
+        .map(issue => `${issue.path?.map(segment => String(segment.key)).join('.') || '(root)'}: ${issue.message}`)
+        .join('; ');
+      console.error('Invalid chat message:', value);
+      throw new Error(`Invalid chat message: ${details}`);
     }
 
     return output;
