@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, computed, effect, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
-import type { MapData, MapFeatureProperties, MapLocation } from '@talkbikes/shared';
+import { AfterViewInit, Component, effect, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
+import type { MapFeatureProperties, MapLocation } from '@talkbikes/shared';
 import type { FeatureCollection, Point } from 'geojson';
 import { getVersion, LngLatBounds, Map, NavigationControl, setWorkerUrl, type GeoJSONSource } from 'maplibre-gl';
 import { LOCATION_COUNT_LAYER_ID, LOCATIONS_LAYER_ID, LOCATIONS_SOURCE_ID } from '../constants';
@@ -11,16 +11,11 @@ setWorkerUrl(new URL(`maplibre-gl-worker.mjs?v=${getVersion()}`, document.baseUR
   templateUrl: './bike-map.html',
 })
 export class BikeMap implements AfterViewInit, OnDestroy {
-  public readonly toolData = input.required<MapData[]>();
+  public readonly locations = input.required<MapLocation[]>();
 
   private readonly mapElement = viewChild.required<ElementRef<HTMLDivElement>>('map');
   private map: Map | undefined;
   private mapReady = false;
-
-  protected readonly locations = computed(() =>
-    this.toolData().flatMap(result => (result.success ? result.locations : [])),
-  );
-  protected readonly markers = computed(() => this.locations());
 
   constructor() {
     effect(() => this.updateMap(this.locations()));
@@ -38,7 +33,7 @@ export class BikeMap implements AfterViewInit, OnDestroy {
       this.mapReady = true;
       this.map?.addSource(LOCATIONS_SOURCE_ID, {
         type: 'geojson',
-        data: this.toFeatureCollection(this.markers()),
+        data: this.toFeatureCollection(this.locations()),
         cluster: true,
         clusterRadius: 5,
       });

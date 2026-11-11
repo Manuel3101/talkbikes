@@ -28,6 +28,7 @@
     "@talkbikes/shared": "workspace:",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "eventsource-parser": "^4.1.3",
     "maplibre-gl": "^6.14.0",
     "rxjs": "~7.8.0",
     "tailwind-merge": "^3.5.0",

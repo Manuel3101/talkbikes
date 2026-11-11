@@ -4,6 +4,7 @@ import { AppController } from './app.controller.ts';
 import { GbfsModule } from './gbfs/gbfs.module.ts';
 import { GeocodingModule } from './geocoding/geocoding.module.ts';
 import { LlmModule } from './llm/llm.module.ts';
+import { SseService } from './sse/sse.service.ts';
 import { ToolsService } from './tools/tools.service.ts';
 
 describe('AppController', () => {
@@ -13,7 +14,7 @@ describe('AppController', () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [GbfsModule, GeocodingModule, LlmModule],
       controllers: [AppController],
-      providers: [ToolsService],
+      providers: [ToolsService, SseService],
     }).compile();
 
     appController = app.get<AppController>(AppController);

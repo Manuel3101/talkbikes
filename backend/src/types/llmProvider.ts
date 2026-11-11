@@ -10,5 +10,8 @@ export interface LlmProvider {
 }
 
 export interface LlmOrchestrator {
-  orchestrateLlmRequest(question: string, options: { provider: LlmProviderName }): AsyncIterable<ChatMessage>;
+  orchestrateLlmRequest(
+    question: string,
+    options: { id: Input['id']; provider: LlmProviderName },
+  ): AsyncIterable<ChatMessage>;
 }

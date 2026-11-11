@@ -1,6 +1,6 @@
 import { inject, Service } from '@angular/core';
-import type { ChatMessage, LlmProviderInfo, UserQuestion } from '@talkbikes/shared';
-import { Ndjson } from './ndjson.service';
+import type { LlmProviderInfo, SseEvent, UserQuestion } from '@talkbikes/shared';
+import { Sse } from './sse.service';
 
 // TODO: replace with .env variable
 const API_URL = 'http://localhost:3000';
@@ -9,7 +9,7 @@ const PROVIDERS_ENDPOINT = `${API_URL}/providers`;
 
 @Service()
 export class ChatService {
-  private ndjson = inject(Ndjson);
+  private sse = inject(Sse);
   // TODO: add options object for things like "stream=true"
   async listProviders(signal?: AbortSignal): Promise<LlmProviderInfo[]> {
     const response = await fetch(PROVIDERS_ENDPOINT, { headers: { Accept: 'application/json' }, signal });
@@ -22,11 +22,11 @@ export class ChatService {
     return data;
   }
 
-  async *send(request: UserQuestion, signal?: AbortSignal): AsyncGenerator<ChatMessage> {
+  async *send(request: UserQuestion, signal?: AbortSignal): AsyncGenerator<SseEvent> {
     const response = await fetch(CHAT_ENDPOINT, {
       method: 'POST',
       headers: {
-        Accept: 'application/x-ndjson',
+        Accept: 'text/event-stream',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
@@ -43,6 +43,6 @@ export class ChatService {
 
     const reader = response.body.getReader();
 
-    yield* this.ndjson.parseNDJSON(reader);
+    yield* this.sse.parseToSseEvent(reader);
   }
 }

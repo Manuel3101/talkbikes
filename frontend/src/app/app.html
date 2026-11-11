@@ -56,7 +56,7 @@
               @for (message of messages(); track message.id) { @if (message.role === 'system' || message.role ===
               'assistant') {
               <div hlmMessageScrollerItem [messageId]="message.id" [scrollAnchor]="false">
-                <app-system-message [message]="message" [mapData]="mapDataByMessageId()[message.id] ?? []" />
+                <app-system-message [message]="message" [mapData]="locationsByMessageId()[message.id] ?? []" />
               </div>
               } @else {
               <div
@@ -74,7 +74,11 @@
         </div>
       </div>
 
-      @if (chatResponse.isLoading() || isStreaming()) {
+      @if (errorMessage(); as error) {
+      <div class="border-t border-white/10 bg-red-500/10 px-4 py-3 text-sm text-red-200 sm:px-6" role="alert">
+        {{ error }}
+      </div>
+      } @if (isStreaming()) {
       <div
         class="animate-pulse border-t border-white/10 px-4 py-3 text-sm text-zinc-500 sm:px-6"
         role="status"

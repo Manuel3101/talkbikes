@@ -1,7 +1,13 @@
-import { Component, inject, linkedSignal, resource, ResourceStreamItem, signal } from '@angular/core';
+import { Component, DestroyRef, inject, resource, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
-import type { ChatMessage, UserQuestion as ChatRequest, LlmProviderName, MapData } from '@talkbikes/shared';
+import type {
+  ChatMessage,
+  UserQuestion as ChatRequest,
+  LlmProviderName,
+  MapLocation,
+  SseEvent,
+} from '@talkbikes/shared';
 import { DEFAULT_LLM_PROVIDER } from '@talkbikes/shared';
 
 import { ProviderSelect } from './provider-select/provider-select';
@@ -26,14 +32,10 @@ const INITIAL_MESSAGES: ChatMessage[] = [
 })
 export class App {
   private readonly chatService = inject(ChatService);
-  protected readonly messages = linkedSignal<ChatMessage | undefined, ChatMessage[]>({
-    source: () => this.chatResponse.value(),
-    computation: (message, previous) => {
-      const messages = previous?.value ?? INITIAL_MESSAGES;
-      return message && message.role !== 'tool' ? this.appendMessage(messages, message) : messages;
-    },
-  });
-  protected readonly draftQuestion = signal('');
+  private abortController: AbortController | undefined;
+
+  protected readonly messages = signal<ChatMessage[]>(INITIAL_MESSAGES);
+  protected readonly draftQuestion = signal('Wo finde ich freie Fahrräder nahe Köln Hbf im Umkreis von 500 Meter?');
   protected readonly selectedProvider = signal<LlmProviderName>(DEFAULT_LLM_PROVIDER);
   /**
    * Providers offered by the backend. If loading fails the selector is hidden
@@ -42,57 +44,19 @@ export class App {
   protected readonly providers = resource({
     loader: ({ abortSignal }) => this.chatService.listProviders(abortSignal),
   });
-  private readonly submittedQuestion = signal<ChatRequest | undefined>(undefined);
   protected readonly isStreaming = signal(false);
   /**
-   * Receives response chunks which triggers `messages` to recompute
+   * Message of the last failed request, shown until the next question is submitted
    */
-  protected readonly chatResponse = resource<ChatMessage | undefined, ChatRequest | undefined>({
-    params: () => this.submittedQuestion(),
-    stream: ({ params, abortSignal }) => {
-      const data = signal<ResourceStreamItem<ChatMessage | undefined>>({ value: undefined });
-      this.isStreaming.set(true);
-
-      void (async () => {
-        try {
-          for await (const chunk of this.chatService.send(params, abortSignal)) {
-            if (abortSignal.aborted) {
-              return;
-            }
-            data.set({ value: chunk });
-          }
-        } catch (error: unknown) {
-          if (!abortSignal.aborted) {
-            data.set({ error: error instanceof Error ? error : new Error('Chat request failed') });
-          }
-        } finally {
-          this.isStreaming.set(false);
-        }
-      })();
-
-      return data;
-    },
-  });
-
+  protected readonly errorMessage = signal<string | undefined>(undefined);
   /**
-   *  Tracks `tool_data` for each message by its `id`
+   * Locations received via `tool` events for each assistant message by its `id`
    */
-  protected readonly mapDataByMessageId = linkedSignal<ChatMessage | undefined, Record<string, MapData[]>>({
-    source: () => this.chatResponse.value(),
-    computation: (message, previous) => {
-      const dataByMessageId = previous?.value ?? {};
-      const toolData = message?.tool_data;
+  protected readonly locationsByMessageId = signal<Record<string, MapLocation[]>>({});
 
-      if (message?.role !== 'tool' || !toolData) {
-        return dataByMessageId;
-      }
-
-      return {
-        ...dataByMessageId,
-        [message.id]: [...(dataByMessageId[message.id] ?? []), toolData],
-      };
-    },
-  });
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.abortController?.abort());
+  }
 
   protected submitQuestion(): void {
     const question = this.draftQuestion().trim();
@@ -102,23 +66,68 @@ export class App {
 
     this.messages.update(messages => [...messages, { id: crypto.randomUUID(), role: 'user', content: question }]);
     this.draftQuestion.set('');
-    this.isStreaming.set(true);
-    this.submittedQuestion.set({ question, provider: this.selectedProvider() });
+    this.errorMessage.set(undefined);
+    void this.streamAnswer({ question, provider: this.selectedProvider() });
   }
 
-  private appendMessage(messages: ChatMessage[], message: ChatMessage): ChatMessage[] {
-    const index = messages.findIndex(currentMessage => currentMessage.id === message.id);
-    if (index === -1) {
-      return [...messages, message];
+  private async streamAnswer(request: ChatRequest): Promise<void> {
+    const abortController = new AbortController();
+    this.abortController = abortController;
+    this.isStreaming.set(true);
+
+    try {
+      let messageId: string | undefined;
+      for await (const event of this.chatService.send(request, abortController.signal)) {
+        if (abortController.signal.aborted) {
+          return;
+        }
+
+        if (event.event === 'start') {
+          messageId = event.data.id;
+        } else if (event.event === 'end' || event.event === 'error') {
+          this.handleTerminalEvent(event);
+          return;
+        } else if (messageId) {
+          this.handleMessageEvent(messageId, event);
+        }
+      }
+    } catch (error: unknown) {
+      if (!abortController.signal.aborted) {
+        this.errorMessage.set(error instanceof Error ? error.message : 'Chat request failed');
+      }
+    } finally {
+      this.isStreaming.set(false);
+    }
+  }
+
+  private handleTerminalEvent(event: Extract<SseEvent, { event: 'end' | 'error' }>): void {
+    if (event.event === 'error') {
+      this.errorMessage.set(event.data.message);
+    }
+  }
+
+  private handleMessageEvent(id: string, event: Extract<SseEvent, { event: 'content' | 'tool' }>): void {
+    this.ensureAssistantMessage(id);
+
+    if (event.event === 'content') {
+      this.messages.update(messages =>
+        messages.map(message =>
+          message.id === id ? { ...message, content: message.content + event.data.content } : message,
+        ),
+      );
+    } else {
+      this.locationsByMessageId.update(locationsByMessageId => ({
+        ...locationsByMessageId,
+        [id]: [...(locationsByMessageId[id] ?? []), ...event.data],
+      }));
+    }
+  }
+
+  private ensureAssistantMessage(id: string): void {
+    if (this.messages().some(message => message.id === id)) {
+      return;
     }
 
-    return messages.map((currentMessage, currentIndex) =>
-      currentIndex === index
-        ? {
-            ...currentMessage,
-            content: currentMessage.content + message.content,
-          }
-        : currentMessage,
-    );
+    this.messages.update(messages => [...messages, { id, role: 'assistant', content: '' }]);
   }
 }
