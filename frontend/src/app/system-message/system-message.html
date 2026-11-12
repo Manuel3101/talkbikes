@@ -6,7 +6,7 @@
     >
       {{ message().content }}
     </p>
-    @defer (when mapData().length > 0) {
+    @defer (when message().content.trim() !== '' && mapData().length > 0) {
     <app-bike-map [locations]="mapData()" />
     } @error {
     <p class="rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-200">Die Karte konnte nicht geladen werden.</p>
