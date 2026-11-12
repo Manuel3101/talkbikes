@@ -35,7 +35,7 @@ export class App {
   private abortController: AbortController | undefined;
 
   protected readonly messages = signal<ChatMessage[]>(INITIAL_MESSAGES);
-  protected readonly draftQuestion = signal('Wo finde ich freie Fahrräder nahe Köln Hbf im Umkreis von 500 Meter?');
+  protected readonly draftQuestion = signal('');
   protected readonly selectedProvider = signal<LlmProviderName>(DEFAULT_LLM_PROVIDER);
   /**
    * Providers offered by the backend. If loading fails the selector is hidden
