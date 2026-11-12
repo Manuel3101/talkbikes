@@ -85,7 +85,9 @@ export class App {
         if (event.event === 'start') {
           messageId = event.data.id;
         } else if (event.event === 'end' || event.event === 'error') {
-          this.handleTerminalEvent(event);
+          if (event.event === 'error') {
+            this.errorMessage.set(event.data.message);
+          }
           return;
         } else if (messageId) {
           this.handleMessageEvent(messageId, event);
@@ -97,12 +99,6 @@ export class App {
       }
     } finally {
       this.isStreaming.set(false);
-    }
-  }
-
-  private handleTerminalEvent(event: Extract<SseEvent, { event: 'end' | 'error' }>): void {
-    if (event.event === 'error') {
-      this.errorMessage.set(event.data.message);
     }
   }
 
