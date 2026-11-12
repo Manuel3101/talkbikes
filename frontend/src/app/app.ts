@@ -107,9 +107,8 @@ export class App {
   }
 
   private handleMessageEvent(id: string, event: Extract<SseEvent, { event: 'content' | 'tool' }>): void {
-    this.ensureAssistantMessage(id);
-
     if (event.event === 'content') {
+      this.ensureAssistantMessage(id);
       this.messages.update(messages =>
         messages.map(message =>
           message.id === id ? { ...message, content: message.content + event.data.content } : message,
