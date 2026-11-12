@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post, Res, StandardSchemaValidationPipe } from '@nestjs/common';
-import { DEFAULT_LLM_PROVIDER, type LlmProviderInfo, type UserQuestion, userQuestionSchema } from '@talkbikes/shared';
+import { type ChatRequest, chatRequestSchema, DEFAULT_LLM_PROVIDER, type LlmProviderInfo } from '@talkbikes/shared';
 import type { Response } from 'express';
 import { LlmService } from './llm/llm.service.ts';
 import { SseService } from './sse/sse.service.ts';
@@ -19,12 +19,12 @@ export class AppController {
   @Post('chat')
   @HttpCode(200)
   async chat(
-    @Body({ schema: userQuestionSchema, pipes: [StandardSchemaValidationPipe] }) body: UserQuestion,
+    @Body({ schema: chatRequestSchema, pipes: [StandardSchemaValidationPipe] }) body: ChatRequest,
     @Res() response: Response,
   ): Promise<void> {
     const id = crypto.randomUUID();
 
-    const messages = this.llmService.orchestrateLlmRequest(body.question, {
+    const messages = this.llmService.orchestrateLlmRequest(body.messages, {
       id,
       provider: body.provider ?? DEFAULT_LLM_PROVIDER,
     });

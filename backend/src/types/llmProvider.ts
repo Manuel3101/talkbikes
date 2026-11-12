@@ -1,4 +1,4 @@
-import type { ChatMessage, LlmProviderName } from '@talkbikes/shared';
+import type { ChatMessage, ConversationMessage, LlmProviderName } from '@talkbikes/shared';
 
 export type Input = {
   id: ReturnType<typeof crypto.randomUUID>;
@@ -11,7 +11,7 @@ export interface LlmProvider {
 
 export interface LlmOrchestrator {
   orchestrateLlmRequest(
-    question: string,
+    conversation: ConversationMessage[],
     options: { id: Input['id']; provider: LlmProviderName },
   ): AsyncIterable<ChatMessage>;
 }

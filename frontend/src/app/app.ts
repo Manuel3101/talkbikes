@@ -1,13 +1,7 @@
 import { Component, DestroyRef, inject, resource, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
-import type {
-  ChatMessage,
-  UserQuestion as ChatRequest,
-  LlmProviderName,
-  MapLocation,
-  SseEvent,
-} from '@talkbikes/shared';
+import type { ChatMessage, ChatRequest, LlmProviderName, MapLocation, SseEvent } from '@talkbikes/shared';
 import { DEFAULT_LLM_PROVIDER } from '@talkbikes/shared';
 
 import { ProviderSelect } from './provider-select/provider-select';
@@ -67,7 +61,17 @@ export class App {
     this.messages.update(messages => [...messages, { id: crypto.randomUUID(), role: 'user', content: question }]);
     this.draftQuestion.set('');
     this.errorMessage.set(undefined);
-    void this.streamAnswer({ question, provider: this.selectedProvider() });
+    void this.streamAnswer({ messages: this.conversationHistory(), provider: this.selectedProvider() });
+  }
+
+  /**
+   * The user and assistant messages sent to the backend. The initial greeting
+   * and empty messages are left out.
+   */
+  private conversationHistory(): ChatRequest['messages'] {
+    return this.messages().flatMap(({ role, content }) =>
+      (role === 'user' || role === 'assistant') && content ? [{ role, content }] : [],
+    );
   }
 
   private async streamAnswer(request: ChatRequest): Promise<void> {

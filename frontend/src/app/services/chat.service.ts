@@ -1,5 +1,5 @@
 import { inject, Service } from '@angular/core';
-import type { LlmProviderInfo, SseEvent, UserQuestion } from '@talkbikes/shared';
+import type { ChatRequest, LlmProviderInfo, SseEvent } from '@talkbikes/shared';
 import { Sse } from './sse.service';
 
 // TODO: replace with .env variable
@@ -22,7 +22,7 @@ export class ChatService {
     return data;
   }
 
-  async *send(request: UserQuestion, signal?: AbortSignal): AsyncGenerator<SseEvent> {
+  async *send(request: ChatRequest, signal?: AbortSignal): AsyncGenerator<SseEvent> {
     const response = await fetch(CHAT_ENDPOINT, {
       method: 'POST',
       headers: {

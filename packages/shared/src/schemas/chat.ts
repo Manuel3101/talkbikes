@@ -25,8 +25,14 @@ export const llmProviderInfoSchema = v.object({
   description: v.string(),
 });
 
-export type UserQuestion = v.InferOutput<typeof userQuestionSchema>;
-export const userQuestionSchema = v.object({
-  question: v.string(),
+export type ConversationMessage = v.InferOutput<typeof conversationMessageSchema>;
+export const conversationMessageSchema = v.object({
+  role: v.union([v.literal('user'), v.literal('assistant')]),
+  content: v.string(),
+});
+
+export type ChatRequest = v.InferOutput<typeof chatRequestSchema>;
+export const chatRequestSchema = v.object({
+  messages: v.pipe(v.array(conversationMessageSchema), v.minLength(1)),
   provider: v.optional(llmProviderNameSchema),
 });

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { ChatMessage, LlmProviderInfo, LlmProviderName } from '@talkbikes/shared';
+import type { ChatMessage, ConversationMessage, LlmProviderInfo, LlmProviderName } from '@talkbikes/shared';
 import { SYSTEM_PROMPT } from '../constants.ts';
 import type { Input, LlmOrchestrator } from '../types/llmProvider.ts';
 import { LlmFactory } from './llmFactory.ts';
@@ -10,18 +10,17 @@ export class LlmService implements LlmOrchestrator {
   constructor(private readonly llmFactory: LlmFactory) {}
 
   public async *orchestrateLlmRequest(
-    question: string,
+    conversation: ConversationMessage[],
     options: { id: Input['id']; provider: LlmProviderName },
   ): AsyncIterable<ChatMessage> {
     const { id } = options;
-    // TODO: need to send entire chat history instead of just the last user question
     const messages: ChatMessage[] = [
       {
         id: crypto.randomUUID(),
         role: 'system',
         content: SYSTEM_PROMPT,
       },
-      { id, role: 'user', content: question },
+      ...conversation.map(({ role, content }) => ({ id: crypto.randomUUID(), role, content })),
     ];
     const provider = this.llmFactory.create(options.provider);
     yield* provider.streamChat({ id, messages });
