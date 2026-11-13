@@ -40,7 +40,7 @@
     "@angular/compiler-cli": "^22.2.0",
     "@angular/language-server": "^22.2.2",
     "@angular/language-service": "^22.2.2",
-    "@spartan-ng/cli": "^1.6.3",
+    "@spartan-ng/cli": "^1.9.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/geojson": "^7946.0.16",
     "jsdom": "^30.0.0",
