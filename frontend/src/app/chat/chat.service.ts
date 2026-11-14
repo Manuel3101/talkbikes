@@ -1,6 +1,6 @@
 import { inject, Service } from '@angular/core';
 import type { ChatRequest, LlmProviderInfo, SseEvent } from '@talkbikes/shared';
-import { Sse } from './sse.service';
+import { Sse } from '../sse/sse.service';
 
 // TODO: replace with .env variable
 const API_URL = 'http://localhost:3000';

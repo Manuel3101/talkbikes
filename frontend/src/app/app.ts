@@ -4,8 +4,8 @@ import { HlmMessageScrollerImports } from '@spartan-ng/helm/message-scroller';
 import type { ChatMessage, ChatRequest, LlmProviderName, MapLocation, SseEvent } from '@talkbikes/shared';
 import { DEFAULT_LLM_PROVIDER } from '@talkbikes/shared';
 
+import { ChatService } from './chat/chat.service';
 import { ProviderSelect } from './provider-select/provider-select';
-import { ChatService } from './services/chat.service';
 import { SystemMessage as AssistantMessage } from './system-message/system-message';
 import { UserMessage } from './user-message/user-message';
 import { UserQuestion } from './user-question/user-question';
