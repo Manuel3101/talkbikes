@@ -221,6 +221,9 @@ importers:
       ollama:
         specifier: ^0.6.4
         version: 0.6.4
+      redis:
+        specifier: ^6.4.0
+        version: 6.4.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -357,7 +360,7 @@ importers:
         version: 22.2.2
       '@spartan-ng/cli':
         specifier: ^1.9.0
-        version: 1.9.0(@angular-devkit/core@22.3.0(chokidar@6.0.0))(@angular-devkit/schematics@22.3.0(chokidar@6.0.0))(@angular/build@22.3.0(@angular/compiler-cli@22.2.2(@angular/compiler@22.2.6)(typescript@6.0.3))(@angular/compiler@22.2.6)(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(@angular/platform-browser@22.2.2(@angular/common@22.2.2(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)))(@types/node@26.6.6)(jiti@2.7.0)(postcss@8.5.33)(supports-color@10.2.2)(tailwindcss@4.3.5)(tslib@2.9.1)(typescript@6.0.3)(vitest@5.1.0)(yaml@2.9.0))(@angular/compiler@22.2.6)(@babel/traverse@7.29.10(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(chokidar@6.0.0)(debug@4.4.3(supports-color@10.2.2))(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(rxjs@7.8.2)(supports-color@10.2.2)(tslib@2.9.1)
+        version: 1.9.0(@angular-devkit/core@22.3.0(chokidar@6.0.0))(@angular-devkit/schematics@22.3.0(chokidar@6.0.0))(@angular/build@22.3.0(@angular/compiler-cli@22.2.2(@angular/compiler@22.2.6)(typescript@6.0.3))(@angular/compiler@22.2.6)(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(@angular/platform-browser@22.2.2(@angular/common@22.2.2(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)))(@types/node@26.6.6)(jiti@2.7.0)(postcss@8.5.33)(supports-color@10.2.2)(tailwindcss@4.3.5)(tslib@2.9.1)(typescript@6.0.3)(vitest@5.1.0)(yaml@2.9.0))(@angular/compiler@22.2.6)(@babel/traverse@7.29.10(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(rxjs@7.8.2)(supports-color@10.2.2)(tslib@2.9.1)
       '@tailwindcss/postcss':
         specifier: ^4.1.12
         version: 4.3.3
@@ -2737,6 +2740,42 @@ packages:
 
   '@quansync/fs@1.1.0':
     resolution: {integrity: sha512-qAPG/t3HqML1TlN7sY/pTbEjzFVAKsMjNNMGheyDosro+kT4iw2KCUoHcVdmliwWjorm4elZbgNQyU2eD97eDg==}
+
+  '@redis/bloom@6.4.0':
+    resolution: {integrity: sha512-haBv1OKeJoKxoAxwKEHPDKdoZaLIuWAKNr4VFRF2C3Rjjn7Ese5fijEW6295rMBIyddZfuIOcvH1aZ/yKzy8vQ==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.4.0
+
+  '@redis/client@6.4.0':
+    resolution: {integrity: sha512-XEFSX0W1BUVFwtWC41vk5P/U5CqvacBWypFbmYHdF1gJeIYWWmEzsM2R5mPb+65SdODFQk7xuuMPFP6s1t9nhw==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@node-rs/xxhash': ^1.1.0
+      '@opentelemetry/api': '>=1 <2'
+    peerDependenciesMeta:
+      '@node-rs/xxhash':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
+
+  '@redis/json@6.4.0':
+    resolution: {integrity: sha512-Dtxn3c2u5H5r3MA6kMrFI6iSOo4BIwibwkep94BMBD5ba1Eik1UYIwInX9lZ10RdUT4+BD7ZS9lAoORBvXUEYg==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.4.0
+
+  '@redis/search@6.4.0':
+    resolution: {integrity: sha512-B4L2OD5BMwbOYewQ9KGJfukLUkRQz1gc91TEOxz76KLeJsLbHB0XXa7sKMNoB3JURPWvhuY0PE04fHQVYZPZKg==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.4.0
+
+  '@redis/time-series@6.4.0':
+    resolution: {integrity: sha512-5QpeIlX/r0h0//JfJ8h4/Il9i0SGHhnOkdcocOhFDp0pb8VgVCEkxeCkUx8IR3g3rlq+uiPIf4NCueveHS9Vbw==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.4.0
 
   '@rolldown/binding-android-arm-eabi@1.2.19':
     resolution: {integrity: sha512-e+Ebe0WT+9tbXmNKPIiC8YrWAHYwug3m6i4p3rZGGulfZri1jtI4HslT+OZnFf/OIHowWF71DTlHwXBP2SiA7A==}
@@ -5165,6 +5204,10 @@ packages:
     resolution: {integrity: sha512-Kko+Y5XQ6fM+Ce3dq3m9YGxnacYZYl9cA1wZjaF3Vbry2L3i1qVg8+CAgNPsXRArPMUMCaOR7oa9Nqntc43JKA==}
     engines: {node: '>= 20.19.0'}
 
+  redis@6.4.0:
+    resolution: {integrity: sha512-8Xk9zRovBNDzIO3xRi036QFgijIZKeIPjQJ5VhgxV8nxkxDP5GlE5se71G1I4TnUTojbCtmfKzXpioxlDhHJvg==}
+    engines: {node: '>= 20.0.0'}
+
   reflect-metadata@0.2.2:
     resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
 
@@ -6121,7 +6164,7 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@angular-devkit/core@21.2.14(chokidar@6.0.0)':
+  '@angular-devkit/core@21.2.14':
     dependencies:
       ajv: 8.18.0
       ajv-formats: 3.0.1
@@ -6129,8 +6172,6 @@ snapshots:
       picomatch: 4.0.4
       rxjs: 7.8.2
       source-map: 0.7.6
-    optionalDependencies:
-      chokidar: 6.0.0
 
   '@angular-devkit/core@22.2.0(chokidar@5.0.0)':
     dependencies:
@@ -6174,9 +6215,9 @@ snapshots:
       - '@types/node'
       - chokidar
 
-  '@angular-devkit/schematics@21.2.14(chokidar@6.0.0)':
+  '@angular-devkit/schematics@21.2.14':
     dependencies:
-      '@angular-devkit/core': 21.2.14(chokidar@6.0.0)
+      '@angular-devkit/core': 21.2.14
       jsonc-parser: 3.3.1
       magic-string: 0.30.21
       ora: 9.3.0
@@ -7931,7 +7972,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.3
 
-  '@nx/angular@23.3.0(@angular-devkit/core@22.3.0(chokidar@6.0.0))(@angular-devkit/schematics@22.3.0(chokidar@6.0.0))(@angular/build@22.3.0(@angular/compiler-cli@22.2.2(@angular/compiler@22.2.6)(typescript@6.0.3))(@angular/compiler@22.2.6)(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(@angular/platform-browser@22.2.2(@angular/common@22.2.2(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)))(@types/node@26.6.6)(jiti@2.7.0)(postcss@8.5.33)(supports-color@10.2.2)(tailwindcss@4.3.5)(tslib@2.9.1)(typescript@6.0.3)(vitest@5.1.0)(yaml@2.9.0))(@babel/traverse@7.29.10(supports-color@10.2.2))(@schematics/angular@21.2.14(chokidar@6.0.0))(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(nx@23.3.0)(rxjs@7.8.2)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@nx/angular@23.3.0(@angular-devkit/core@22.3.0(chokidar@6.0.0))(@angular-devkit/schematics@22.3.0(chokidar@6.0.0))(@angular/build@22.3.0(@angular/compiler-cli@22.2.2(@angular/compiler@22.2.6)(typescript@6.0.3))(@angular/compiler@22.2.6)(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(@angular/platform-browser@22.2.2(@angular/common@22.2.2(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)))(@types/node@26.6.6)(jiti@2.7.0)(postcss@8.5.33)(supports-color@10.2.2)(tailwindcss@4.3.5)(tslib@2.9.1)(typescript@6.0.3)(vitest@5.1.0)(yaml@2.9.0))(@babel/traverse@7.29.10(supports-color@10.2.2))(@schematics/angular@21.2.14)(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(nx@23.3.0)(rxjs@7.8.2)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@angular-devkit/core': 22.3.0(chokidar@6.0.0)
       '@angular-devkit/schematics': 22.3.0(chokidar@6.0.0)
@@ -7940,7 +7981,7 @@ snapshots:
       '@nx/js': 23.3.0(@babel/traverse@7.29.10(supports-color@10.2.2))(nx@23.3.0)(supports-color@10.2.2)
       '@nx/web': 23.3.0(@babel/traverse@7.29.10(supports-color@10.2.2))(@nx/eslint@23.3.0(@babel/traverse@7.29.10(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(nx@23.3.0)(supports-color@10.2.2))(debug@4.4.3(supports-color@10.2.2))(nx@23.3.0)(supports-color@10.2.2)
       '@phenomnomnominal/tsquery': 6.2.0(typescript@6.0.3)
-      '@schematics/angular': 21.2.14(chokidar@6.0.0)
+      '@schematics/angular': 21.2.14
       '@typescript-eslint/type-utils': 8.71.1(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       jsonc-parser: 3.3.1
       magic-string: 0.30.21
@@ -8368,6 +8409,24 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
+  '@redis/bloom@6.4.0(@redis/client@6.4.0)':
+    dependencies:
+      '@redis/client': 6.4.0
+
+  '@redis/client@6.4.0': {}
+
+  '@redis/json@6.4.0(@redis/client@6.4.0)':
+    dependencies:
+      '@redis/client': 6.4.0
+
+  '@redis/search@6.4.0(@redis/client@6.4.0)':
+    dependencies:
+      '@redis/client': 6.4.0
+
+  '@redis/time-series@6.4.0(@redis/client@6.4.0)':
+    dependencies:
+      '@redis/client': 6.4.0
+
   '@rolldown/binding-android-arm-eabi@1.2.19':
     optional: true
 
@@ -8541,10 +8600,10 @@ snapshots:
     dependencies:
       '@rspack/binding': 2.3.2
 
-  '@schematics/angular@21.2.14(chokidar@6.0.0)':
+  '@schematics/angular@21.2.14':
     dependencies:
-      '@angular-devkit/core': 21.2.14(chokidar@6.0.0)
-      '@angular-devkit/schematics': 21.2.14(chokidar@6.0.0)
+      '@angular-devkit/core': 21.2.14
+      '@angular-devkit/schematics': 21.2.14
       jsonc-parser: 3.3.1
     transitivePeerDependencies:
       - chokidar
@@ -8573,15 +8632,15 @@ snapshots:
       tslib: 2.9.1
       tw-animate-css: 1.4.0
 
-  '@spartan-ng/cli@1.9.0(@angular-devkit/core@22.3.0(chokidar@6.0.0))(@angular-devkit/schematics@22.3.0(chokidar@6.0.0))(@angular/build@22.3.0(@angular/compiler-cli@22.2.2(@angular/compiler@22.2.6)(typescript@6.0.3))(@angular/compiler@22.2.6)(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(@angular/platform-browser@22.2.2(@angular/common@22.2.2(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)))(@types/node@26.6.6)(jiti@2.7.0)(postcss@8.5.33)(supports-color@10.2.2)(tailwindcss@4.3.5)(tslib@2.9.1)(typescript@6.0.3)(vitest@5.1.0)(yaml@2.9.0))(@angular/compiler@22.2.6)(@babel/traverse@7.29.10(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(chokidar@6.0.0)(debug@4.4.3(supports-color@10.2.2))(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(rxjs@7.8.2)(supports-color@10.2.2)(tslib@2.9.1)':
+  '@spartan-ng/cli@1.9.0(@angular-devkit/core@22.3.0(chokidar@6.0.0))(@angular-devkit/schematics@22.3.0(chokidar@6.0.0))(@angular/build@22.3.0(@angular/compiler-cli@22.2.2(@angular/compiler@22.2.6)(typescript@6.0.3))(@angular/compiler@22.2.6)(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(@angular/platform-browser@22.2.2(@angular/common@22.2.2(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)))(@types/node@26.6.6)(jiti@2.7.0)(postcss@8.5.33)(supports-color@10.2.2)(tailwindcss@4.3.5)(tslib@2.9.1)(typescript@6.0.3)(vitest@5.1.0)(yaml@2.9.0))(@angular/compiler@22.2.6)(@babel/traverse@7.29.10(supports-color@10.2.2))(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(rxjs@7.8.2)(supports-color@10.2.2)(tslib@2.9.1)':
     dependencies:
       '@angular/core': 22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)
-      '@nx/angular': 23.3.0(@angular-devkit/core@22.3.0(chokidar@6.0.0))(@angular-devkit/schematics@22.3.0(chokidar@6.0.0))(@angular/build@22.3.0(@angular/compiler-cli@22.2.2(@angular/compiler@22.2.6)(typescript@6.0.3))(@angular/compiler@22.2.6)(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(@angular/platform-browser@22.2.2(@angular/common@22.2.2(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)))(@types/node@26.6.6)(jiti@2.7.0)(postcss@8.5.33)(supports-color@10.2.2)(tailwindcss@4.3.5)(tslib@2.9.1)(typescript@6.0.3)(vitest@5.1.0)(yaml@2.9.0))(@babel/traverse@7.29.10(supports-color@10.2.2))(@schematics/angular@21.2.14(chokidar@6.0.0))(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(nx@23.3.0)(rxjs@7.8.2)(supports-color@10.2.2)(typescript@6.0.3)
+      '@nx/angular': 23.3.0(@angular-devkit/core@22.3.0(chokidar@6.0.0))(@angular-devkit/schematics@22.3.0(chokidar@6.0.0))(@angular/build@22.3.0(@angular/compiler-cli@22.2.2(@angular/compiler@22.2.6)(typescript@6.0.3))(@angular/compiler@22.2.6)(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(@angular/platform-browser@22.2.2(@angular/common@22.2.2(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.6(@angular/compiler@22.2.6)(rxjs@7.8.2)))(@types/node@26.6.6)(jiti@2.7.0)(postcss@8.5.33)(supports-color@10.2.2)(tailwindcss@4.3.5)(tslib@2.9.1)(typescript@6.0.3)(vitest@5.1.0)(yaml@2.9.0))(@babel/traverse@7.29.10(supports-color@10.2.2))(@schematics/angular@21.2.14)(@zkochan/js-yaml@0.0.7)(debug@4.4.3(supports-color@10.2.2))(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(nx@23.3.0)(rxjs@7.8.2)(supports-color@10.2.2)(typescript@6.0.3)
       '@nx/devkit': 23.3.0(nx@23.3.0)
       '@nx/js': 23.3.0(@babel/traverse@7.29.10(supports-color@10.2.2))(nx@23.3.0)(supports-color@10.2.2)
       '@nx/workspace': 23.3.0
       '@phenomnomnominal/tsquery': 6.2.0(typescript@6.0.3)
-      '@schematics/angular': 21.2.14(chokidar@6.0.0)
+      '@schematics/angular': 21.2.14
       enquirer: 2.3.6
       jsonc-eslint-parser: 2.4.2
       node-html-parser: 7.1.0
@@ -10868,6 +10927,17 @@ snapshots:
       util-deprecate: 1.0.2
 
   readdirp@5.1.1: {}
+
+  redis@6.4.0:
+    dependencies:
+      '@redis/bloom': 6.4.0(@redis/client@6.4.0)
+      '@redis/client': 6.4.0
+      '@redis/json': 6.4.0(@redis/client@6.4.0)
+      '@redis/search': 6.4.0(@redis/client@6.4.0)
+      '@redis/time-series': 6.4.0(@redis/client@6.4.0)
+    transitivePeerDependencies:
+      - '@node-rs/xxhash'
+      - '@opentelemetry/api'
 
   reflect-metadata@0.2.2: {}
 

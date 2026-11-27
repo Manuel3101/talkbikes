@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { v23 } from 'gbfs-typescript-types';
+import { RedisService } from '../redis/redis.service.ts';
 
 type Provider = 'nextbike_kg';
 
@@ -9,7 +10,8 @@ export class GbfsService {
   private readonly providers: Record<Provider, string> = {
     nextbike_kg: 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_kg/gbfs.json',
   };
-  private cache: Partial<Record<Provider, v23.Gbfs>> = {};
+
+  constructor(private readonly redis: RedisService) {}
 
   async getBikeAvailability(): Promise<v23.FreeBikeStatus | null> {
     try {
@@ -53,18 +55,16 @@ export class GbfsService {
    * @throws error if the provider is not found or if the fetch fails
    */
   private async getGbfsFile(provider: Provider = 'nextbike_kg'): Promise<v23.Gbfs> {
-    const cached = this.cache[provider];
-    if (cached && this.isCacheFresh(cached)) {
-      console.debug(`Using cached GBFS data for provider ${provider}`);
+    const cached = await this.readCache(provider);
+    if (cached) {
       return cached;
     }
 
     try {
       const response = await fetch(this.providers[provider]);
       const data = (await response.json()) as v23.Gbfs;
-      console.debug('Caching data for gbfs file:  ', data);
 
-      this.cache[provider] = data;
+      await this.writeCache(provider, data);
       return data;
     } catch (error: unknown) {
       console.error(`Error fetching GBFS for provider ${provider}:`, error);
@@ -72,10 +72,31 @@ export class GbfsService {
     }
   }
 
-  private isCacheFresh(data: v23.Gbfs): boolean {
-    const age = Math.floor(Date.now() / 1000) - data.last_updated;
+  private cacheKey(provider: Provider): string {
+    return `gbfs:${provider}`;
+  }
 
-    return age < data.ttl;
+  private async readCache(provider: Provider): Promise<v23.Gbfs | null> {
+    try {
+      return await this.redis.getJson<v23.Gbfs>(this.cacheKey(provider));
+    } catch (error: unknown) {
+      console.error(`Error reading GBFS cache for provider ${provider}:`, error);
+      return null;
+    }
+  }
+
+  private async writeCache(provider: Provider, data: v23.Gbfs): Promise<void> {
+    const age = Math.floor(Date.now() / 1000) - data.last_updated;
+    const remainingTtl = Math.floor(data.ttl - age);
+    if (!(remainingTtl > 0)) {
+      return;
+    }
+
+    try {
+      await this.redis.setJson(this.cacheKey(provider), data, remainingTtl);
+    } catch (error: unknown) {
+      console.error(`Error writing GBFS cache for provider ${provider}:`, error);
+    }
   }
 
   private async getGbfsFileUrl(dataType: string, provider: Provider = 'nextbike_kg'): Promise<string> {
