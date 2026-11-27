@@ -10,7 +10,7 @@ autoDedupe: true
 
 catalog:
   typescript: ^6.0.3
-  '@types/node': '^26.2.0'
+  '@types/node': '^26.6.6'
 
 allowBuilds:
   '@parcel/watcher': true
