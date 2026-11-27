@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
-import { ChatService } from './services/chat.service';
+import { ChatService } from './chat/chat.service';
 
 describe('App', () => {
   beforeEach(async () => {
